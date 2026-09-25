@@ -619,7 +619,7 @@ window.COJOINZ_DATA = {
     "title": "GAME INSTRUCTIONS FOR COJOINZ LETTERZ",
     "subtitle": "CoJoinz Letterz Rulebook",
     "version": "2.0",
-    "lastUpdated": "2026-09-16"
+    "lastUpdated": "2026-09-25"
   },
   "sections": [
     {
@@ -635,7 +635,7 @@ window.COJOINZ_DATA = {
       "children": [
         {
           "id": "1.1",
-          "title": "CoJoinz Letterz Intro:  CoJoinz Letterz is a 3-axis stackable-tile word game played without a game board, played on the customary X-axis (Left<>Right), the Y-axis (Top<>Bottom), and the Z-axis (literally 3D-vertical from the playing surface of the tabletop). CoJoinz Letterz has five unique versions (Full; Token-free; Action-Lite; Bonus-Lite, and Freeplay), as follows:",
+          "title": "CoJoinz Letterz Intro:  CoJoinz Letterz is a 3-axis stackable-tile word game played without a game board, played on the customary X-axis (Left<>Right), the Y-axis (Top<>Bottom), and the Z-axis (literally 3D-vertical from the playing surface of the tabletop). CoJoinz Letterz has five unique versions (Full; Tokenz-free; Bonus-Lite; Action-Lite; and Freeplay), as follows:",
           "depth": 2,
           "blocks": [],
           "children": [
@@ -648,28 +648,28 @@ window.COJOINZ_DATA = {
             },
             {
               "id": "1.1.2",
-              "title": "Token-free Version: A streamlined variation of the Full gameplay (by vote of Players prior to the game’s start) that removes all Tokenz from gameplay entirely. This simplifies gameplay into a more classic “word-builder” game where Players exclusively compete each turn to construct the highest-scoring words on the grid for the highest overall score at game’s end. Token-free gameplay can reduce typical game duration by 50% or more (1-2 hours duration, or less in LIMITED MODE).",
+              "title": "Tokenz-free Version: A streamlined variation of the Full gameplay (by vote of Players prior to the game’s start) that removes all Tokenz from gameplay entirely. This simplifies gameplay into a more classic “word-builder” game where Players exclusively compete each turn to construct the highest-scoring words on the grid for the highest overall score at game’s end. Tokenz-free gameplay can reduce typical game duration by 50% or more (1-2 hours duration, or less in LIMITED MODE).",
               "depth": 3,
               "blocks": [],
               "children": []
             },
             {
               "id": "1.1.3",
-              "title": "Bonus-Lite Version: A streamlined variation of the Full gameplay (by vote of Players prior to the game’s start) so that the only Tokenz that are played with Letter Tiles are the Bonus Tokenz. Unlike Token-free gameplay, the Bonus Tokenz in Bonus-Lite gameplay provide another path to points while also providing a \"lite\" strategic layer. Bonus-Lite gameplay can reduce typical game duration, although it is usually longer than the Token-free version due to the interactions caused by the Bonus Tokenz.",
+              "title": "Bonus-Lite Version: A streamlined variation of the Full gameplay (by vote of Players prior to the game’s start) so that the only Tokenz that are played with Letter Tiles are the Bonus Tokenz. Unlike Tokenz-free gameplay, the Bonus Tokenz in Bonus-Lite gameplay provide another path to points while also providing a \"lite\" strategic layer. Bonus-Lite gameplay can reduce typical game duration, although it is usually longer than the Tokenz-free version due to the interactions caused by the Bonus Tokenz.",
               "depth": 3,
               "blocks": [],
               "children": []
             },
             {
               "id": "1.1.4",
-              "title": "Action-Lite Version: A streamlined variation of the Full gameplay (by vote of Players prior to the game’s start) so that the only Tokenz that are played with Letter Tiles are the Action Tokenz. Unlike Token-free and Bonus-Lite gameplay, the Action Tokenz in Action-Lite gameplay provide a \"lite\" strategic dimension. Action-Lite gameplay can reduce typical game duration, although it is usually longer than the Token-free version due to the interactions caused by the Action Tokenz.",
+              "title": "Action-Lite Version: A streamlined variation of the Full gameplay (by vote of Players prior to the game’s start) so that the only Tokenz that are played with Letter Tiles are the Action Tokenz. Unlike Tokenz-free and Bonus-Lite gameplay, the Action Tokenz in Action-Lite gameplay provide a \"lite\" strategic dimension. Action-Lite gameplay can reduce typical game duration, although it is usually longer than the Tokenz-free version due to the interactions caused by the Action Tokenz.",
               "depth": 3,
               "blocks": [],
               "children": []
             },
             {
               "id": "1.1.5",
-              "title": "Freeplay Version: Similar to Token-free gameplay except there is no scorekeeping. This provides an fun opportunity for creative vocabulary-building, where vocbulary \"experimentation\" is encouraged.",
+              "title": "Freeplay Version: Similar to Tokenz-free gameplay except there is no scorekeeping. This provides a fun opportunity for creative vocabulary-building, where vocabulary \"experimentation\" is encouraged.",
               "depth": 3,
               "blocks": [],
               "children": []
@@ -678,7 +678,7 @@ window.COJOINZ_DATA = {
         },
         {
           "id": "1.2",
-          "title": "Limited Modes: In standard gameplay mode, gameplay is dependent upon the quantity of Letter Tiles Players. With Limited Modes, Players may choose to limit the gameplay duration when playing any of the five versions of CoJoinz. Each of these three Limited Modes adjusts the gameplay, as follows:",
+          "title": "Limited Modes: In standard (UNLIMITED) gameplay mode, the game's length depends on the quantity of Letter Tiles in the deck. With Limited Modes, Players may choose to limit the gameplay duration when playing any of the five versions of CoJoinz. Each of these three Limited Modes adjusts the gameplay, as follows:",
           "depth": 2,
           "blocks": [],
           "children": [
@@ -763,7 +763,7 @@ window.COJOINZ_DATA = {
                 },
                 {
                   "id": "1.3.1.4",
-                  "title": "Starting Tokenz Qty. [in game versions other than Tokenz-free and Freeplay]: choose between 2 and 5 Tokenz pairs initially distributed to each Player. More starting Tokenz generally permits greater gameplay variety at an early stage, but may limit the Tokenz availability in later stages of gameplay.",
+                  "title": "Starting Tokenz Qty. [in game versions other than Tokenz-free and Freeplay]: choose between 2 and 5 starting Tokenz per type for each Player. In the Full Version, each Player draws that number of both Action and Bonus Tokenz. In the Bonus-Lite Version, each Player draws only Bonus Tokenz; in the Action-Lite Version, only Action Tokenz. More starting Tokenz generally permits greater gameplay variety at an early stage, but may limit the Tokenz availability in later stages of gameplay.",
                   "depth": 4,
                   "blocks": [],
                   "children": []
@@ -794,19 +794,26 @@ window.COJOINZ_DATA = {
             },
             {
               "id": "1.4.2",
-              "title": "Starting Bonus Tokenz: Per the vote results, each Player (starting to the left of the Scorekeeper) will draw 2-5 Bonus Tokenz from the draw deck.",
+              "title": "Starting Action Tokenz [Full and Action-Lite Versions only]: Per the vote results, each Player (starting to the left of the Scorekeeper) will draw 2-5 Action Tokenz from the draw deck.",
               "depth": 3,
               "blocks": [],
               "children": []
             },
             {
               "id": "1.4.3",
-              "title": "Starting Action Tokenz: Per the vote results, each Player (starting to the left of the Scorekeeper) will draw 2-5 Action Tokenz from the draw deck.",
+              "title": "Starting Bonus Tokenz [Full and Bonus-Lite Versions only]: Per the vote results, each Player (starting to the left of the Scorekeeper) will draw 2-5 Bonus Tokenz from the draw deck.",
               "depth": 3,
               "blocks": [],
               "children": []
             }
           ]
+        },
+        {
+          "id": "1.5",
+          "title": "First Turn: The Player to the left of the Scorekeeper takes the first turn; play then continues clockwise (see 5.1).",
+          "depth": 2,
+          "blocks": [],
+          "children": []
         }
       ]
     },
@@ -1508,7 +1515,7 @@ window.COJOINZ_DATA = {
               "children": [
                 {
                   "id": "2.2.1.1",
-                  "title": "When a Player earns one or more T-PAIRs (the \"Earning Player\"), they blindly draw one Action Tokenz from its draw deck and then draw one Bonus Tokenz from its draw deck. This sequence is always followed, regardless of how many T-PAIRS the Player earns. Most often, immediately after each T-PAIR is drawn, something very special happens: it is called the \"T-PAIR Share\":",
+                  "title": "When a Player earns one or more T-PAIRs (the \"Earning Player\"), they blindly draw one Action Tokenz from its draw deck and then draw one Bonus Tokenz from its draw deck. This sequence is always followed, regardless of how many T-PAIRS the Player earns. In the Bonus-Lite and Action-Lite Versions, the Earning Player instead draws only one Tokenz of the type used in that version (Bonus or Action). Most often, immediately after each T-PAIR is drawn, something very special happens: it is called the \"T-PAIR Share\":",
                   "depth": 4,
                   "blocks": [],
                   "children": [
@@ -1545,7 +1552,7 @@ window.COJOINZ_DATA = {
                             },
                             {
                               "id": "2.2.1.1.1.1.3",
-                              "title": "WAGER Session payoff: the Winning Player who won the payoff \"pot\" (see Rule 3.8.8)",
+                              "title": "WAGER Session payoff: the Winning Player who won the payoff \"pot\" (see Rule 3.5.2.2.9)",
                               "depth": 7,
                               "blocks": [],
                               "children": []
@@ -1579,9 +1586,9 @@ window.COJOINZ_DATA = {
           ],
           "children": [
             {
-              "id": "2.3.1.1",
-              "title": "\"Anytime\" Action Tokenz may only be played outside of a Player's turn are therefore not limited to one/turn. However, \"Anytime\" Action Tokenz are limited to one action per Tokenz and they expire after their action is completed.",
-              "depth": 4,
+              "id": "2.3.1",
+              "title": "\"Anytime\" Action Tokenz may only be played outside of a Player's turn and are therefore not limited to one/turn. However, \"Anytime\" Action Tokenz are limited to one action per Tokenz and they expire after their action is completed.",
+              "depth": 3,
               "blocks": [],
               "children": []
             },
@@ -1622,7 +1629,7 @@ window.COJOINZ_DATA = {
           "children": [
             {
               "id": "3.1.1",
-              "title": "Word Lookups: In addition to providing loads of fun, CoJoinz Letterz is intended to provide a vocabulary-building benefit. So, all Players are encouraged to actively check word validity and/or gameplay options at any time (and for any quantity of times) prior to their turn. But, as a courtesy to other Players (so as not create an unfair delay), work lookups should not be done during one's turn.",
+              "title": "Word Lookups: In addition to providing loads of fun, CoJoinz Letterz is intended to provide a vocabulary-building benefit. So, all Players are encouraged to actively check word validity and/or gameplay options at any time (and for any quantity of times) prior to their turn. But, as a courtesy to other Players (so as not to create an unfair delay), word lookups should not be done during one's turn.",
               "depth": 3,
               "blocks": [],
               "children": []
@@ -2000,7 +2007,7 @@ window.COJOINZ_DATA = {
                       "children": [
                         {
                           "id": "3.5.2.2.8.1",
-                          "title": "Invalid Words:",
+                          "title": "WAGER Invalid Words:",
                           "depth": 6,
                           "blocks": [
                             {
@@ -2489,22 +2496,153 @@ window.COJOINZ_DATA = {
      The first anchor for a section becomes that card's element id; any
      further anchors on the same section become hidden alias ids inside it.
      To add a new anchor, just add a line here. */
+  /* Named section anchors — FULL SET (2026-09-24).
+     Rules (see project doc INFOZ_錨點規則與完整清單_0924):
+     - Every section has one canonical anchor (listed first = the card's element id).
+     - Extra lines for the same section are permanent aliases (old links keep working).
+     - NEVER rename or delete an anchor. Only edit its title regex / fallbackId.
+     - Title regex must match exactly ONE section title (auditNamedAnchors() checks this). */
   const NAMED_ANCHORS = [
-    { anchor: "gameplay-version", title: /^CoJoinz Letterz Intro/i,     fallbackId: "1.1" },
-    { anchor: "limited-modes",    title: /^Limited Modes/i,             fallbackId: "1.2" },
-    { anchor: "time-mode",        title: /^Limited Modes/i,             fallbackId: "1.2" },
-    { anchor: "time-limited",     title: /^TIME[-\s]limited/i,          fallbackId: "1.2.1" },
-    { anchor: "round-limited",    title: /^ROUND[-\s]limited/i,         fallbackId: "1.2.2" },
-    { anchor: "deck-limited",     title: /^DECK[-\s]limited/i,          fallbackId: "1.2.3" },
-    { anchor: "starting-tpairs",  title: /^Starting Tokenz Qty/i,       fallbackId: "1.3.1.4" },
-    { anchor: "refill",           title: /^Letter Tiles:\s*starting/i,  fallbackId: "1.4.1" },
-    { anchor: "t-pairs",          title: /T-PAIR\W{0,3}\s*Process/i,    fallbackId: "2.2.1" },
-    { anchor: "word-validity",    title: /^Word Validity Rule/i,        fallbackId: "3.1" },
-    { anchor: "word-challenges",  title: /^Word Challenges/i,           fallbackId: "3.2" },
-    { anchor: "grid-play",        title: /^Letter Tile Stacking/i,      fallbackId: "3.3" },
-    { anchor: "action-tokenz",    title: /^Action Tokenz:?\s*$/i,       fallbackId: "3.5" },
-    { anchor: "bonus-tokenz",     title: /^Bonus Tokenz:?\s*$/i,        fallbackId: "3.7" },
-    { anchor: "scoring",          title: /^Scoring\b/i,                 fallbackId: "4.0" },
+    // ---- Chapter 1 ----
+    { anchor: "overview",                  title: /^OVERVIEW\s*&\s*SETUP/i, fallbackId: "1.0" },
+    { anchor: "letterz-intro",             title: /^CoJoinz Letterz Intro/i, fallbackId: "1.1" },
+    { anchor: "gameplay-version",          title: /^CoJoinz Letterz Intro/i, fallbackId: "1.1" },
+    { anchor: "full-version",              title: /^Full Version/i, fallbackId: "1.1.1" },
+    { anchor: "token-free-version",        title: /^Tokenz?-free Version/i, fallbackId: "1.1.2" },
+    { anchor: "bonus-lite-version",        title: /^Bonus-Lite Version/i, fallbackId: "1.1.3" },
+    { anchor: "action-lite-version",       title: /^Action-Lite Version/i, fallbackId: "1.1.4" },
+    { anchor: "freeplay-version",          title: /^Freeplay Version/i, fallbackId: "1.1.5" },
+    { anchor: "limited-modes",             title: /^Limited Modes/i, fallbackId: "1.2" },
+    { anchor: "time-mode",                 title: /^Limited Modes/i, fallbackId: "1.2" },
+    { anchor: "time-limited",              title: /^TIME[-\s]limited/i, fallbackId: "1.2.1" },
+    { anchor: "round-limited",             title: /^ROUND[-\s]limited/i, fallbackId: "1.2.2" },
+    { anchor: "deck-limited",              title: /^DECK[-\s]limited/i, fallbackId: "1.2.3" },
+    { anchor: "game-prep",                 title: /^Game Prep/i, fallbackId: "1.3" },
+    { anchor: "setup-vote",                title: /^Setup\b/i, fallbackId: "1.3.1" },
+    { anchor: "vote-gameplay-version",     title: /^Gameplay Version/i, fallbackId: "1.3.1.1" },
+    { anchor: "vote-game-mode",            title: /^Game Mode/i, fallbackId: "1.3.1.2" },
+    { anchor: "game-mode",                 title: /^Game Mode/i, fallbackId: "1.3.1.2" },
+    { anchor: "scorekeeper-selection",     title: /^Scorekeeper Selection/i, fallbackId: "1.3.1.3" },
+    { anchor: "starting-tpairs",           title: /^Starting Tokenz Qty/i, fallbackId: "1.3.1.4" },
+    { anchor: "starting-tokenz",           title: /^Starting Tokenz Qty/i, fallbackId: "1.3.1.4" },
+    { anchor: "assembly",                  title: /^Assembly/i, fallbackId: "1.3.2" },
+    { anchor: "opening-draw",              title: /^Opening Draw/i, fallbackId: "1.4" },
+    { anchor: "opening-draw-letter-tiles", title: /^Letter Tiles:\s*starting/i, fallbackId: "1.4.1" },
+    { anchor: "refill",                    title: /^Letter Tiles:\s*starting/i, fallbackId: "1.4.1" },
+    { anchor: "starting-action-tokenz",    title: /^Starting Action Tokenz/i, fallbackId: "1.4.2" },
+    { anchor: "starting-bonus-tokenz",     title: /^Starting Bonus Tokenz/i, fallbackId: "1.4.3" },
+    { anchor: "first-turn",                title: /^First Turn/i, fallbackId: "1.5" },
+    // ---- Chapter 2 ----
+    { anchor: "tokenz",                    title: /^TOKENZ:?\s*$/i, fallbackId: "2.0" },
+    { anchor: "tokenz-types",              title: /^Tokenz Types/i, fallbackId: "2.1" },
+    { anchor: "action-tokenz-list",        title: /^Action:/i, fallbackId: "2.1.1" },
+    { anchor: "bonus-tokenz-list",         title: /^Bonus:/i, fallbackId: "2.1.2" },
+    { anchor: "tokenz-earning",            title: /^Tokenz Earning/i, fallbackId: "2.2" },
+    { anchor: "t-pairs",                   title: /T-PAIR\W{0,3}\s*Process/i, fallbackId: "2.2.1" },
+    { anchor: "t-pair-process",            title: /T-PAIR\W{0,3}\s*Process/i, fallbackId: "2.2.1" },
+    { anchor: "t-pair-draw",               title: /^When a Player earns one or more T-PAIRs/i, fallbackId: "2.2.1.1" },
+    { anchor: "t-pair-share",              title: /^T-PAIR Share Rule/i, fallbackId: "2.2.1.1.1" },
+    { anchor: "t-pair-share-exemptions",   title: /^T-PAIR Share Exemptions/i, fallbackId: "2.2.1.1.1.1" },
+    { anchor: "exemption-valid-word",      title: /^VALID WORD:/i, fallbackId: "2.2.1.1.1.1.1" },
+    { anchor: "exemption-invalid-word",    title: /^INVALID WORD:/i, fallbackId: "2.2.1.1.1.1.2" },
+    { anchor: "exemption-wager-payoff",    title: /^WAGER Session payoff/i, fallbackId: "2.2.1.1.1.1.3" },
+    { anchor: "exemption-bonus-tokenz",    title: /^\W*Bonus\W+Tokenz:\s*Any Player/i, fallbackId: "2.2.1.1.1.1.4" },
+    { anchor: "tokenz-expiration",         title: /^Tokenz Play\s*&\s*Expiration/i, fallbackId: "2.3" },
+    { anchor: "anytime-expiration",        title: /^\W*Anytime\W+Action Tokenz may only/i, fallbackId: "2.3.1" },
+    { anchor: "bonus-discard",             title: /^All used Bonus Tokenz/i, fallbackId: "2.3.2" },
+    { anchor: "action-discard",            title: /^During a Player.s turn, standard Action Tokenz/i, fallbackId: "2.3.3" },
+    // ---- Chapter 3 ----
+    { anchor: "rules-of-play",             title: /^RULES OF PLAY/i, fallbackId: "3.0" },
+    { anchor: "word-validity",             title: /^Word Validity Rule/i, fallbackId: "3.1" },
+    { anchor: "wordscanz",                 title: /^Word Validity Rule/i, fallbackId: "3.1" },
+    { anchor: "word-lookups",              title: /^Word Lookups/i, fallbackId: "3.1.1" },
+    { anchor: "word-challenges",           title: /^Word Challenges/i, fallbackId: "3.2" },
+    { anchor: "challenge-valid-word",      title: /^Valid Words:/i, fallbackId: "3.2.1" },
+    { anchor: "challenge-invalid-word",    title: /^Invalid Words:\s*If the word is proven invalid/i, fallbackId: "3.2.2" },
+    { anchor: "non-fluency-handicap",      title: /^Non-fluency Handicap/i, fallbackId: "3.2.3" },
+    { anchor: "misspelling-forgiveness",   title: /^As an exception to the Word Challenge rules/i, fallbackId: "3.2.3.1" },
+    { anchor: "tile-stacking",             title: /^Letter Tile Stacking/i, fallbackId: "3.3" },
+    { anchor: "grid-play",                 title: /^Letter Tile Stacking/i, fallbackId: "3.3" },
+    { anchor: "stacking-duplication",      title: /^Stacking Duplication/i, fallbackId: "3.3.1" },
+    { anchor: "wild-tile-sealing",         title: /^\W*Sealing\W+a Wild tile/i, fallbackId: "3.3.1.1" },
+    { anchor: "tile-exchanges",            title: /^Letter Tile Exchanges/i, fallbackId: "3.4" },
+    { anchor: "exchange",                  title: /^Letter Tile Exchanges/i, fallbackId: "3.4" },
+    { anchor: "action-tokenz",             title: /^Action Tokenz:?\s*$/i, fallbackId: "3.5" },
+    { anchor: "anytime-action-tokenz",     title: /^\W*Anytime\W+Action Tokenz:?\s*$/i, fallbackId: "3.5.1" },
+    { anchor: "special-sessions",          title: /^SPECIAL SESSION Action Tokenz/i, fallbackId: "3.5.2" },
+    { anchor: "trade-time",                title: /^\W*TRADE TIME/i, fallbackId: "3.5.2.1" },
+    { anchor: "wager-sessions",            title: /^\W*WAGER\W+Action Tokenz\s*&\s*WAGER Sessions/i, fallbackId: "3.5.2.2" },
+    { anchor: "wager",                     title: /^\W*WAGER\W+Action Tokenz\s*&\s*WAGER Sessions/i, fallbackId: "3.5.2.2" },
+    { anchor: "wager-currency",            title: /^Tokenz As Currency/i, fallbackId: "3.5.2.2.1" },
+    { anchor: "wager-activation",          title: /^WAGER Session Activation/i, fallbackId: "3.5.2.2.2" },
+    { anchor: "wager-activation-start",    title: /^WAGER Sessions begin when/i, fallbackId: "3.5.2.2.2.1" },
+    { anchor: "wager-activation-scorz",    title: /^The Scorekeeper then announces/i, fallbackId: "3.5.2.2.2.2" },
+    { anchor: "wager-activation-pools",    title: /^Each Player will set up their individual/i, fallbackId: "3.5.2.2.2.3" },
+    { anchor: "wager-pools",               title: /^\W*Wager Pools\W*$/i, fallbackId: "3.5.2.2.3" },
+    { anchor: "wager-pool-size",           title: /^Each Player will wager only/i, fallbackId: "3.5.2.2.3.1" },
+    { anchor: "wager-pool-six-plus",       title: /^Players who currently possess 6 or more/i, fallbackId: "3.5.2.2.3.2" },
+    { anchor: "wager-pool-under-six",      title: /^Players who currently possess fewer than 6/i, fallbackId: "3.5.2.2.3.3" },
+    { anchor: "t-pair-debt",               title: /^\W*T-PAIR Debt\W*$/i, fallbackId: "3.5.2.2.4" },
+    { anchor: "t-pair-debt-logging",       title: /^All T-PAIR Debt will be/i, fallbackId: "3.5.2.2.4.1" },
+    { anchor: "t-pair-debt-repayment",     title: /^At the end of the game, any unpaid/i, fallbackId: "3.5.2.2.4.2" },
+    { anchor: "debt-repay-tokenz",         title: /^Firstly/i, fallbackId: "3.5.2.2.4.2.1" },
+    { anchor: "debt-repay-points",         title: /^Secondly/i, fallbackId: "3.5.2.2.4.2.2" },
+    { anchor: "wager-pot-ante",            title: /^The\W+Pot\W+and\W+Ante/i, fallbackId: "3.5.2.2.5" },
+    { anchor: "wager-ante",                title: /^All initial Tokenz/i, fallbackId: "3.5.2.2.5.1" },
+    { anchor: "wagering-round",            title: /^The Wagering Round/i, fallbackId: "3.5.2.2.6" },
+    { anchor: "opening-wager",             title: /^Opening Wager/i, fallbackId: "3.5.2.2.6.1" },
+    { anchor: "opening-options",           title: /^The\W+Opening\W+Options/i, fallbackId: "3.5.2.2.6.1.1" },
+    { anchor: "post-open-options",         title: /^Post-Open Options/i, fallbackId: "3.5.2.2.6.1.2" },
+    { anchor: "wager-showdown",            title: /^Showdown/i, fallbackId: "3.5.2.2.7" },
+    { anchor: "wager-reveal",              title: /^The\W+Reveal/i, fallbackId: "3.5.2.2.8" },
+    { anchor: "wager-invalid-words",       title: /^WAGER Invalid Words/i, fallbackId: "3.5.2.2.8.1" },
+    { anchor: "wager-payoff",              title: /^Payoff\s*&\s*Resolution/i, fallbackId: "3.5.2.2.9" },
+    { anchor: "wager-session-end",         title: /^Session End/i, fallbackId: "3.5.2.2.10" },
+    { anchor: "remove-tokenz",             title: /^\W*REMOVE\W+Action Tokenz\s*&/i, fallbackId: "3.5.3" },
+    { anchor: "remove-1-tile",             title: /^\W*REMOVE 1 Tile/i, fallbackId: "3.5.3.1" },
+    { anchor: "remove-2-tiles",            title: /^\W*REMOVE 2 Tiles/i, fallbackId: "3.5.3.2" },
+    { anchor: "remove-3-tiles",            title: /^\W*REMOVE 3 Tiles/i, fallbackId: "3.5.3.3" },
+    { anchor: "remove-1-word",             title: /^\W*REMOVE 1 Word/i, fallbackId: "3.5.3.4" },
+    { anchor: "remaining-grid",            title: /^Remaining Grid/i, fallbackId: "3.5.3.5" },
+    { anchor: "no-replacement-play",       title: /^No\W+Replacement/i, fallbackId: "3.5.3.6" },
+    { anchor: "team-work",                 title: /^\W*TEAM WORK\W+Action Tokenz/i, fallbackId: "3.6" },
+    { anchor: "team-turns",                title: /^\W*TEAM WORK\W+Action Tokenz/i, fallbackId: "3.6" },
+    { anchor: "team-leader",               title: /^TEAM Leader/i, fallbackId: "3.6.1" },
+    { anchor: "team-boosts",               title: /^TEAM Boosts/i, fallbackId: "3.6.2" },
+    { anchor: "bonus-tokenz",              title: /^Bonus Tokenz:?\s*$/i, fallbackId: "3.7" },
+    { anchor: "bonus-tally",               title: /^After the Player has finished their Grid Play/i, fallbackId: "3.7.1" },
+    { anchor: "stack-bonus",               title: /^\W*STACK\W+Bonus Tokenz/i, fallbackId: "3.7.2" },
+    { anchor: "no-stack-peeking",          title: /^Players may not inspect/i, fallbackId: "3.7.2.1" },
+    { anchor: "wild-tiles",                title: /^Wild Letter Tiles/i, fallbackId: "3.8" },
+    { anchor: "helping-hand",              title: /^\W*HELPING HAND\W+Offers/i, fallbackId: "3.9" },
+    { anchor: "helping-hand-example",      title: /^For instance, if the Helper/i, fallbackId: "3.9.1" },
+    { anchor: "helping-hand-blocker",      title: /^At the same time, one or more/i, fallbackId: "3.9.2" },
+    { anchor: "helping-hand-counter",      title: /^The Helpee may counter-offer/i, fallbackId: "3.9.3" },
+    // ---- Chapter 4 ----
+    { anchor: "scoring",                   title: /^Scoring\b/i, fallbackId: "4.0" },
+    { anchor: "standard-scoring",          title: /^Standard Grid Play/i, fallbackId: "4.1" },
+    { anchor: "perfect-turn",              title: /^Perfect Turn Boost/i, fallbackId: "4.2" },
+    { anchor: "team-scoring",              title: /^TEAM Turn Scoring/i, fallbackId: "4.3" },
+    { anchor: "team-calculation",          title: /^Calculation/i, fallbackId: "4.3.1" },
+    { anchor: "team-score",                title: /^The TEAM Score/i, fallbackId: "4.3.2" },
+    { anchor: "team-points-tiers",         title: /^Tiered Points Distribution/i, fallbackId: "4.3.3" },
+    { anchor: "active-partners",           title: /^Active Partners/i, fallbackId: "4.3.3.1" },
+    { anchor: "passive-partners",          title: /^Passive Partners/i, fallbackId: "4.3.3.2" },
+    { anchor: "leader-reward",             title: /^Leader Reward/i, fallbackId: "4.3.3.3" },
+    { anchor: "team-t-pairs",              title: /^TEAM\W+T-PAIRS/i, fallbackId: "4.3.4" },
+    { anchor: "team-t-pairs-all",          title: /^All Players:/i, fallbackId: "4.3.4.1" },
+    { anchor: "team-t-pairs-leader",       title: /^Leader:/i, fallbackId: "4.3.4.2" },
+    { anchor: "team-perfect-turn",         title: /^The TEAM Perfect Turn/i, fallbackId: "4.3.5" },
+    { anchor: "team-perfect-threshold",    title: /^The Threshold/i, fallbackId: "4.3.5.1" },
+    { anchor: "all-partners-boost",        title: /^The\W+All-Partners\W+Boost/i, fallbackId: "4.3.5.2" },
+    { anchor: "team-scoring-table",        title: /^TEAM Scoring Table/i, fallbackId: "4.3.6" },
+    // ---- Chapter 5 ----
+    { anchor: "winning",                   title: /^Winning/i, fallbackId: "5.0" },
+    { anchor: "going-out",                 title: /^Going Out/i, fallbackId: "5.1" },
+    { anchor: "game-end-boost",            title: /^Game-End Boost/i, fallbackId: "5.2" },
+    { anchor: "hand-points",               title: /^Hand Points Auditing/i, fallbackId: "5.3" },
+    { anchor: "t-pair-debt-audit",         title: /^T-PAIR Debt Auditing/i, fallbackId: "5.4" },
+    { anchor: "victory",                   title: /^Victory/i, fallbackId: "5.5" },
   ];
   let ANCHOR_TO_SECTION = {};   // "scoring" -> "4.0"
   let SECTION_TO_ANCHORS = {};  // "4.0" -> ["scoring"]
@@ -2963,6 +3101,34 @@ window.COJOINZ_DATA = {
       ANCHOR_TO_SECTION[def.anchor] = hit.id;
       (SECTION_TO_ANCHORS[hit.id] = SECTION_TO_ANCHORS[hit.id] || []).push(def.anchor);
     });
+    auditNamedAnchors();
+  }
+
+  /* Anchor self-check. Runs on page load AND after every Excel import
+     (both call resolveNamedAnchors). Open DevTools console and look for
+     "[INFOZ anchors]". Expected result: "all OK" — except
+     wager-invalid-words, which uses its number until 3.5.2.2.8.1 is
+     retitled "WAGER Invalid Words:". */
+  function auditNamedAnchors() {
+    const msgs = [];
+    NAMED_ANCHORS.forEach((def) => {
+      const hits = FLAT_INDEX.filter((e) => def.title.test(String(e.title || "").trim()));
+      if (!ANCHOR_TO_SECTION[def.anchor]) {
+        msgs.push(`BROKEN  #${def.anchor}: no title match and no section ${def.fallbackId}`);
+      } else if (hits.length > 1) {
+        msgs.push(`AMBIGUOUS  #${def.anchor}: title regex matches ${hits.map((h) => h.id).join(", ")}`);
+      } else if (!hits.length) {
+        msgs.push(`FALLBACK  #${def.anchor}: title not found, using number ${def.fallbackId} — check it is still the right section, then update its title regex`);
+      } else if (hits[0].id !== def.fallbackId) {
+        msgs.push(`RENUMBERED  #${def.anchor}: now section ${hits[0].id} (was ${def.fallbackId}) — update its fallbackId`);
+      }
+    });
+    const anchored = new Set(Object.values(ANCHOR_TO_SECTION));
+    FLAT_INDEX.forEach((e) => {
+      if (!anchored.has(e.id)) msgs.push(`MISSING  section ${e.id} "${String(e.title || "").slice(0, 40)}" has no named anchor`);
+    });
+    if (msgs.length) console.warn("[INFOZ anchors] " + msgs.length + " issue(s):\n" + msgs.join("\n"));
+    else console.info("[INFOZ anchors] all OK — " + NAMED_ANCHORS.length + " anchors, " + FLAT_INDEX.length + " sections");
   }
 
   function prefersReducedMotion() {
