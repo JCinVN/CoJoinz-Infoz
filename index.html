@@ -36,6 +36,7 @@
   --section-title: #FFFF00;
   --divider: #1e90ff;
   --xref: #22c55e;
+  --active-green: #4ade80;
   --topbar-h: 60px;
   --sidebar-w: 300px;
 }
@@ -220,7 +221,7 @@ mark.search-hit-highlight {
 .toc-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .toc-children { margin-left: 14px; border-left: 1px solid var(--border); padding-left: 4px; display: none; }
 .toc-children.open { display: block; }
-.toc-item[data-depth="1"] > .toc-row .toc-title { font-weight: 700; font-size: 15px; font-family: 'Kurvaceous', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: .01em; text-transform: uppercase; color: var(--section-title); }
+.toc-item[data-depth="1"] > .toc-row .toc-title { font-weight: 700; font-size: 15px; font-family: 'Kurvaceous', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--section-title); }
 
 /* ---------- Content ---------- */
 .content {
@@ -290,7 +291,7 @@ mark.search-hit-highlight {
   font-size: 15px;
   line-height: 1.4;
 }
-.section-card[data-depth="1"] > .section-head > .section-title { font-size: 21px; font-family: 'Kurvaceous', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: .01em; text-transform: uppercase; color: var(--section-title); }
+.section-card[data-depth="1"] > .section-head > .section-title { font-size: 21px; font-family: 'Kurvaceous', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--section-title); }
 .section-card:not([data-depth="1"]):not([data-depth="2"]) .section-title { font-size: 14px; color: #e2e8f0; }
 /* Titles written as "Label: explanation…" show the label in bold and the
    explanation as normal (unbolded) body text. */
@@ -303,8 +304,16 @@ a.xref:hover { color: #4ade80; }
 .app-edit-mode a.xref { cursor: text; }
 
 /* Currently selected (active) section in the right pane */
+/* Solid green heading bar with dark text; the body keeps its dark
+   background and gets a green outline plus a green stripe on the left. */
 .section-card.is-active,
-.children-wrap .section-card.is-active { background-color: rgba(74,222,128,0.20); border-color: #4ade80; box-shadow: 0 0 0 1px #4ade80; }
+.children-wrap .section-card.is-active { border-color: var(--active-green); box-shadow: 0 0 0 1px var(--active-green), inset 4px 0 0 var(--active-green); }
+.section-card.is-active[data-depth] > .section-head { background: var(--active-green); }
+.section-card.is-active[data-depth] > .section-head > .section-title,
+.section-card.is-active[data-depth] > .section-head > .section-title .title-rest { color: #04140a; }
+.section-card.is-active[data-depth] > .section-head > .section-badge { color: #04140a; background: rgba(4,20,10,0.10); border-color: rgba(4,20,10,0.45); }
+.section-card.is-active[data-depth] > .section-head > .section-caret { color: #04140a; }
+.section-card.is-active[data-depth] > .section-head a.xref { color: #04140a; }
 
 .section-caret {
   color: var(--text-muted);
@@ -316,6 +325,7 @@ a.xref:hover { color: #4ade80; }
 
 .section-body { padding: 0 16px 16px; display: none; }
 .section-body.open { display: block; }
+.section-body:empty { display: none; } /* heading-only sections: no blank strip */
 
 .block-paragraph {
   font-size: 14px;
