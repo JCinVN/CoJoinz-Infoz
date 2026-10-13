@@ -221,7 +221,7 @@ mark.search-hit-highlight {
 .toc-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .toc-children { margin-left: 14px; border-left: 1px solid var(--border); padding-left: 4px; display: none; }
 .toc-children.open { display: block; }
-.toc-item[data-depth="1"] > .toc-row .toc-title { font-weight: 700; font-size: 15px; font-family: 'Kurvaceous', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--section-title); }
+.toc-item[data-depth="1"] > .toc-row .toc-title { font-weight: 700; font-size: 15px; font-family: 'Kurvaceous', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--section-title); }
 
 /* ---------- Content ---------- */
 .content {
@@ -291,7 +291,7 @@ mark.search-hit-highlight {
   font-size: 15px;
   line-height: 1.4;
 }
-.section-card[data-depth="1"] > .section-head > .section-title { font-size: 21px; font-family: 'Kurvaceous', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--section-title); }
+.section-card[data-depth="1"] > .section-head > .section-title { font-size: 21px; font-family: 'Kurvaceous', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--section-title); }
 .section-card:not([data-depth="1"]):not([data-depth="2"]) .section-title { font-size: 14px; color: #e2e8f0; }
 /* Titles written as "Label: explanation…" show the label in bold and the
    explanation as normal (unbolded) body text. */
@@ -500,6 +500,35 @@ table.block-table th.col-wide, table.block-table td.col-wide { width: 280px; col
   overflow-x: auto;
   white-space: pre;
 }
+
+/* ---------- "Back" after a jump (TOC, link or search) ---------- */
+.back-jump {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 65;
+  display: flex;
+  align-items: stretch;
+  max-width: calc(100vw - 32px);
+  border-radius: 999px;
+  background-color: var(--divider);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+  overflow: hidden;
+}
+.back-jump[hidden] { display: none; }
+.back-jump button {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+}
+.back-jump-btn { padding: 10px 6px 10px 16px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.back-jump-x { padding: 10px 14px 10px 10px; opacity: .8; }
+.back-jump button:hover { background-color: rgba(255,255,255,0.14); }
+.back-jump-x:hover { opacity: 1; }
+@media (max-width: 480px) { .back-jump { right: 16px; bottom: 16px; } }
 
 /* ---------- Resizable pane divider (desktop) ---------- */
 .pane-divider {
@@ -2613,6 +2642,8 @@ window.COJOINZ_DATA = {
   // "see 3.2.1" / "see Rule 3.2.1" cross-references (see renderRichText).
   const XREF_RE = /\bsee\s+(?:Rule\s+|Section\s+)?(\d+(?:\.\d+)+)/gi;
   const SIDEBAR_W_KEY = "cojoinz-infoz-sidebar-w"; // remembered pane width
+  let backDismissed = false; // floating Back button hidden via its ✕
+  let backEl = null;
 
   const el = {
     docHeader: document.getElementById("docHeader"),
@@ -2657,7 +2688,13 @@ window.COJOINZ_DATA = {
     wireEditModal();
     wireEditor();
     restoreFromHash();
-    window.addEventListener("hashchange", restoreFromHash);
+    window.addEventListener("hashchange", () => {
+      // Back/Forward between jumps recorded by navigateTo() is handled by
+      // the popstate listener; only react to hashes typed or linked in.
+      if (history.state && history.state.infoz) return;
+      restoreFromHash();
+    });
+    wireBackNavigation();
   }
 
   function renderHeader() {
@@ -2764,7 +2801,7 @@ window.COJOINZ_DATA = {
         const isOpen = childrenWrap.classList.toggle("open");
         caret.classList.toggle("open", isOpen);
       }
-      goToSection(node.id, true);
+      navigateTo(node.id);
       closeSidebarOnMobile();
     });
 
@@ -3053,7 +3090,8 @@ window.COJOINZ_DATA = {
       e.preventDefault();
       e.stopPropagation();
       if (EDIT_MODE) return;
-      goToSection(link.dataset.target, true);
+      const fromCard = link.closest(".section-card");
+      navigateTo(link.dataset.target, null, fromCard ? fromCard.dataset.sectionId : null);
     }, true);
 
     // Double-click anywhere on a section's box (heading, text, or the gap
@@ -3218,20 +3256,7 @@ window.COJOINZ_DATA = {
     // expand all ancestor section-bodies + itself
     let target = findSectionCard(id);
     if (!target) return;
-    let node = target;
-    const chain = [];
-    while (node) {
-      chain.unshift(node);
-      node = node.parentElement ? node.parentElement.closest(".section-card") : null;
-    }
-    chain.forEach((cardEl) => {
-      const body = cardEl.querySelector(":scope > .section-body");
-      const caret = cardEl.querySelector(":scope > .section-head > .section-caret");
-      if (body && !body.classList.contains("open")) {
-        body.classList.add("open");
-        if (caret) caret.classList.add("open");
-      }
-    });
+    expandToCard(target, true);
 
     setActiveSection(id);
 
@@ -3257,6 +3282,138 @@ window.COJOINZ_DATA = {
     if (updateHash) {
       const named = (SECTION_TO_ANCHORS[id] || [])[0];
       history.replaceState(null, "", "#" + (named || id));
+    }
+  }
+
+  // Opens every ancestor section of `card` (and the card itself if
+  // includeSelf) so it is visible on the page.
+  function expandToCard(card, includeSelf) {
+    let node = includeSelf ? card : (card.parentElement ? card.parentElement.closest(".section-card") : null);
+    while (node) {
+      const body = node.querySelector(":scope > .section-body");
+      const caret = node.querySelector(":scope > .section-head > .section-caret");
+      if (body && !body.classList.contains("open")) {
+        body.classList.add("open");
+        if (caret) caret.classList.add("open");
+      }
+      node = node.parentElement ? node.parentElement.closest(".section-card") : null;
+    }
+  }
+
+  /* ---------------- "Back" after a jump ----------------
+     Every jump from the TOC, an in-text link or a search result adds a
+     browser-history step. Before leaving, the current entry stores exactly
+     where the reader was (the section at the top of the screen + its
+     offset), so the browser's Back button — or the floating "↩ Back to …"
+     button — returns to that exact spot. Jumps chain: each Back steps back
+     one jump. */
+
+  function navigateTo(id, query, fromId) {
+    if (!findSectionCard(id)) return;
+    const cur = history.state && history.state.infoz ? history.state : { infoz: true, depth: 0 };
+    const pos = capturePosition();
+    const from = fromId || activeSectionVisibleId() || (pos && pos.id);
+    // Remember where we are on the current entry before leaving it.
+    history.replaceState(Object.assign({}, cur, { pos: pos, active: activeSectionId() }), "", location.href);
+    const named = (SECTION_TO_ANCHORS[id] || [])[0];
+    if (cur.target === id) {
+      // Same destination again: don't stack duplicate Back steps.
+      goToSection(id, false, query);
+      return;
+    }
+    history.pushState({ infoz: true, depth: (cur.depth || 0) + 1, target: id, backLabel: from ? sectionLabel(from) : (pos.y < 300 ? "top" : "") },
+      "", "#" + (named || id));
+    backDismissed = false;
+    goToSection(id, false, query);
+    updateBackButton();
+  }
+
+  // The section card at the top of the reading area, and how far from the
+  // top of the window it currently sits.
+  function capturePosition() {
+    const topbar = 76; // sticky top bar height + a little breathing room
+    const rect = el.sections.getBoundingClientRect();
+    const x = Math.min(rect.right - 4, rect.left + 40);
+    let elAt = document.elementFromPoint(x, topbar + 8);
+    let card = elAt ? elAt.closest(".section-card") : null;
+    if (!card) {
+      // In a gap between boxes: take the last card starting above that line.
+      const cards = Array.from(el.sections.querySelectorAll(".section-card"));
+      for (const c of cards) {
+        const r = c.getBoundingClientRect();
+        if (r.height && r.top <= topbar + 8) card = c;
+      }
+    }
+    if (!card) return { y: window.scrollY };
+    return { id: card.dataset.sectionId, offset: card.getBoundingClientRect().top, y: window.scrollY };
+  }
+
+  function restorePosition(pos, activeId) {
+    if (activeId) setActiveSection(activeId);
+    if (!pos) return;
+    const card = pos.id ? findSectionCard(pos.id) : null;
+    if (card) {
+      expandToCard(card, false);
+      window.scrollTo(0, window.scrollY + card.getBoundingClientRect().top - pos.offset);
+    } else if (typeof pos.y === "number") {
+      window.scrollTo(0, pos.y);
+    }
+  }
+
+  function activeSectionId() {
+    const c = document.querySelector(".section-card.is-active");
+    return c ? c.dataset.sectionId : null;
+  }
+
+  // The active section, but only if it is on screen right now.
+  function activeSectionVisibleId() {
+    const c = document.querySelector(".section-card.is-active");
+    if (!c) return null;
+    const r = c.getBoundingClientRect();
+    return r.bottom > 60 && r.top < window.innerHeight ? c.dataset.sectionId : null;
+  }
+
+  // "1.5 First Turn" — section number plus the start of its title.
+  function sectionLabel(id) {
+    const entry = FLAT_INDEX.find((e) => e.id === id);
+    if (!entry) return id;
+    let t = String(entry.title || "").split(":")[0].replace(/\*\*/g, "").trim();
+    if (t.length > 28) t = t.slice(0, 27).trim() + "…";
+    return id + " " + t;
+  }
+
+  function wireBackNavigation() {
+    backEl = document.createElement("div");
+    backEl.className = "back-jump";
+    backEl.hidden = true;
+    backEl.innerHTML = '<button type="button" class="back-jump-btn"></button><button type="button" class="back-jump-x" aria-label="Hide the Back button">✕</button>';
+    document.body.appendChild(backEl);
+    backEl.querySelector(".back-jump-btn").addEventListener("click", () => history.back());
+    backEl.querySelector(".back-jump-x").addEventListener("click", () => {
+      backDismissed = true;
+      updateBackButton();
+    });
+
+    window.addEventListener("popstate", (e) => {
+      const st = e.state;
+      if (!st || !st.infoz) return; // a typed/linked hash: hashchange handles it
+      if (st.pos) restorePosition(st.pos, st.active);
+      else if (st.target) goToSection(st.target, false);
+      updateBackButton();
+    });
+    updateBackButton();
+  }
+
+  function updateBackButton() {
+    if (!backEl) return;
+    const st = history.state;
+    const show = !!(st && st.infoz && st.depth > 0 && !backDismissed);
+    backEl.hidden = !show;
+    if (show) {
+      const label = "↩ Back" + (st.backLabel ? " to " + st.backLabel : "");
+      const btn = backEl.querySelector(".back-jump-btn");
+      btn.textContent = label;
+      btn.title = label;
     }
   }
 
@@ -3569,7 +3726,7 @@ window.COJOINZ_DATA = {
   function selectResult(entry, query) {
     el.searchResults.hidden = true;
     el.searchInput.value = "";
-    goToSection(entry.id, true, query);
+    navigateTo(entry.id, query);
     closeSidebarOnMobile();
   }
 
