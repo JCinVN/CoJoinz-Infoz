@@ -1,7 +1,7 @@
 // Standalone build: everything lives inside index.html itself.
 // Bump CACHE_NAME every time index.html changes, so returning players get
 // the new version after one reload instead of two.
-const CACHE_NAME = "cojoinz-infoz-cache-v2-7";
+const CACHE_NAME = "cojoinz-infoz-cache-v2-8";
 
 const ASSETS = [
   "./",
