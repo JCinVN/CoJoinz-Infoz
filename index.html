@@ -33,6 +33,9 @@
   --danger: #ef4444;
   --border: #334155;
   --gold: #fbbf24;
+  --section-title: #FFFF00;
+  --divider: #1e90ff;
+  --xref: #22c55e;
   --topbar-h: 60px;
   --sidebar-w: 300px;
 }
@@ -217,7 +220,7 @@ mark.search-hit-highlight {
 .toc-title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .toc-children { margin-left: 14px; border-left: 1px solid var(--border); padding-left: 4px; display: none; }
 .toc-children.open { display: block; }
-.toc-item[data-depth="1"] > .toc-row .toc-title { font-weight: 700; font-size: 15px; font-family: 'Kurvaceous', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: .01em; }
+.toc-item[data-depth="1"] > .toc-row .toc-title { font-weight: 700; font-size: 15px; font-family: 'Kurvaceous', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: .01em; text-transform: uppercase; color: var(--section-title); }
 
 /* ---------- Content ---------- */
 .content {
@@ -287,10 +290,21 @@ mark.search-hit-highlight {
   font-size: 15px;
   line-height: 1.4;
 }
-.section-card[data-depth="1"] > .section-head > .section-title { font-size: 21px; font-family: 'Kurvaceous', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: .01em; }
-.section-card[data-depth="3"] .section-title,
-.section-card[data-depth="4"] .section-title,
-.section-card[data-depth="5"] .section-title { font-size: 14px; font-weight: 600; color: #e2e8f0; }
+.section-card[data-depth="1"] > .section-head > .section-title { font-size: 21px; font-family: 'Kurvaceous', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: .01em; text-transform: uppercase; color: var(--section-title); }
+.section-card:not([data-depth="1"]):not([data-depth="2"]) .section-title { font-size: 14px; color: #e2e8f0; }
+/* Titles written as "Label: explanation…" show the label in bold and the
+   explanation as normal (unbolded) body text. */
+.section-title .title-rest { font-weight: 400; color: #dbe3ef; }
+.rich-strong { font-weight: 700; }
+
+/* Cross-reference links such as "[see 3.2.1]" */
+a.xref { color: var(--xref); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+a.xref:hover { color: #4ade80; }
+.app-edit-mode a.xref { cursor: text; }
+
+/* Currently selected (active) section in the right pane */
+.section-card.is-active,
+.children-wrap .section-card.is-active { background-color: rgba(74,222,128,0.20); border-color: #4ade80; box-shadow: 0 0 0 1px #4ade80; }
 
 .section-caret {
   color: var(--text-muted);
@@ -330,13 +344,15 @@ table.block-table th, table.block-table td {
   vertical-align: top;
 }
 table.block-table th:last-child, table.block-table td:last-child { border-right: none; }
-table.block-table th { color: var(--accent-glow); background: rgba(16,185,129,0.08); font-weight: 700; }
+table.block-table th { color: var(--accent-glow); background: rgba(16,185,129,0.08); font-weight: 700; white-space: pre-line; }
+table.block-table td.col-strong { font-weight: 700; }
+table.block-table th.col-em, table.block-table td.col-em { font-style: italic; }
 table.block-table tr:last-child td { border-bottom: none; }
 /* Reading-priority columns (name/type/description) stay put; the numeric
    reference columns (count/qty/points) are pushed off to the right, behind
    a horizontal scroll, since they're for looking up not for reading. */
 table.block-table th.col-name, table.block-table td.col-name { width: 170px; font-weight: 600; }
-table.block-table th.col-narrow, table.block-table td.col-narrow { width: 78px; }
+table.block-table th.col-narrow, table.block-table td.col-narrow { width: 104px; }
 table.block-table th.col-wide, table.block-table td.col-wide { width: 280px; color: #dbe3ef; }
 
 .highlight-flash {
@@ -460,7 +476,7 @@ table.block-table th.col-wide, table.block-table td.col-wide { width: 280px; col
   display: flex; align-items: center; justify-content: space-between;
   padding: 14px 18px; border-bottom: 1px solid var(--border);
 }
-.modal-head h2 { font-size: 20px; margin: 0; font-family: 'Kurvaceous', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: .01em; }
+.modal-head h2 { font-size: 20px; margin: 0; font-family: 'Kurvaceous', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; letter-spacing: .01em; text-transform: uppercase; }
 .modal-body { padding: 16px 18px; overflow-y: auto; font-size: 13.5px; line-height: 1.7; color: #dbe3ef; }
 .modal-body code { color: var(--gold); background: rgba(148,163,184,0.12); padding: 1px 5px; border-radius: 4px; font-size: 12.5px; }
 .code-block {
@@ -475,8 +491,48 @@ table.block-table th.col-wide, table.block-table td.col-wide { width: 280px; col
   white-space: pre;
 }
 
+/* ---------- Resizable pane divider (desktop) ---------- */
+.pane-divider {
+  flex: 0 0 8px;
+  position: sticky;
+  top: var(--topbar-h);
+  height: calc(100vh - var(--topbar-h));
+  cursor: ew-resize;
+  background: transparent;
+  z-index: 20;
+  touch-action: none;
+}
+.pane-divider::before {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0; left: 2px;
+  width: 4px;
+  background-color: var(--divider);
+  box-shadow: 0 0 6px rgba(30,144,255,0.6);
+}
+.pane-divider:hover::before, .pane-divider.dragging::before { left: 1px; width: 6px; background-color: #3aa0ff; }
+.pane-divider-tip {
+  position: fixed;
+  z-index: 70;
+  background-color: var(--divider);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1.3;
+  padding: 10px 14px;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+  pointer-events: none;
+  white-space: nowrap;
+}
+body.pane-resizing, body.pane-resizing * { cursor: ew-resize !important; user-select: none !important; }
+@media (min-width: 861px) {
+  .sidebar { width: var(--sidebar-drag-w, var(--sidebar-w)); border-right: none; }
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {
+  .pane-divider, .pane-divider-tip { display: none !important; }
   .sidebar {
     position: fixed;
     left: 0;
@@ -619,7 +675,7 @@ window.COJOINZ_DATA = {
     "title": "GAME INSTRUCTIONS FOR COJOINZ LETTERZ",
     "subtitle": "CoJoinz Letterz Rulebook",
     "version": "2.0",
-    "lastUpdated": "2026-09-25"
+    "lastUpdated": "2026-10-13"
   },
   "sections": [
     {
@@ -635,41 +691,41 @@ window.COJOINZ_DATA = {
       "children": [
         {
           "id": "1.1",
-          "title": "CoJoinz Letterz Intro: CoJoinz Letterz is a 3-axis stackable-tile word game played without a game board (Letter tiles are played on a tabletop or other flat surface in a Grid format). Unlike most games that play only Left>Right and Top>Bottom, CoJoinz Letterz adds truly vertical (stacking) Grid Play. Also, CoJoinz Letterz is 5 Games-in-One, with five unique gameplay versions (Full; Tokenz-free; Bonus-Lite; Action-Lite; and Freeplay), as follows:",
+          "title": "CoJoinz Letterz Intro: CoJoinz Letterz is a 3-axis stackable-tile word game played without a game board (Letter Tiles are played on a tabletop or other flat surface in a Grid format). Unlike most games that play only Left>Right and Top>Bottom, CoJoinz Letterz adds truly vertical (stacking) Grid Play. Also, CoJoinz Letterz is 5 Games-in-One, with five unique gameplay versions (Full; Tokenz-free; Bonus-Lite; Action-Lite; and Freeplay), as follows:",
           "depth": 2,
           "blocks": [],
           "children": [
             {
               "id": "1.1.1",
-              "title": "Full Version: Players, in their turn, adjacently place LETTER tiles (each with a point value shown at the top of the Letter Tile) from their hand within the tabletop grid to form valid words, with the goal of earning the highest score possible. Full gameplay includes Bonus and Action Tokenz that transform gameplay from a more classic “word-builder” game to one with a strategic, wildly dynamic, and often hilarious personality. There is even a type of special Action Tokenz that changes that turn’s gameplay from competitive to collaborative. Normal gameplay sequence is: Action Tokenz -> Grid Play (Letter Tiles) -> Tally Subtotal -> Bonus Tokenz + Tally Total -> [T-PAIRs, if earned] -> Refill Letters. Typical game duration is 2-4 hours (less in LIMITED MODE).",
+              "title": "Full Version: Players, in their turn, adjacently place Letter Tiles (each with a point value shown at the top of the Letter Tile) from their hand within the tabletop grid to form valid words, with the goal of earning the highest score possible. Full gameplay includes Bonus and Action Tokenz that transform gameplay from a more classic word-builder game to one with a strategic, wildly dynamic, and often hilarious personality. There is even a type of special Action Tokenz that changes that turn’s gameplay from competitive to collaborative. Normal gameplay sequence is: Action Tokenz -> Grid Play (Letter Tiles) -> Tally Subtotal -> Bonus Tokenz + Tally Total -> [T-PAIRs, if earned] -> Refill Letters. Typical game duration is 2-4 hours (less in Limited Mode).",
               "depth": 3,
               "blocks": [],
               "children": []
             },
             {
               "id": "1.1.2",
-              "title": "Tokenz-free Version: A streamlined variation of the Full gameplay (by vote of Players prior to the game’s start) that removes all Tokenz from gameplay entirely. This simplifies gameplay into a more classic “word-builder” game where Players exclusively compete each turn to construct the highest-scoring words on the grid for the highest overall score at game’s end. Tokenz-free gameplay can reduce typical game duration by 50% or more (1-2 hours duration, or less in LIMITED MODE).",
+              "title": "Tokenz-free Version: A streamlined variation of the Full gameplay (by vote of Players prior to the game’s start) that removes all Tokenz from gameplay entirely. This simplifies gameplay into a more classic word-builder game where Players exclusively compete each turn to construct the highest-scoring words on the grid for the highest overall score at game’s end. Tokenz-free gameplay can reduce typical game duration by 50% or more (1-2 hours duration, or less in Limited Mode).",
               "depth": 3,
               "blocks": [],
               "children": []
             },
             {
               "id": "1.1.3",
-              "title": "Bonus-Lite Version: A streamlined variation of the Full gameplay (by vote of Players prior to the game’s start) so that the only Tokenz that are played with Letter Tiles are the Bonus Tokenz. Unlike Tokenz-free gameplay, the Bonus Tokenz in Bonus-Lite gameplay provide another path to points while also providing a \"lite\" strategic layer. Bonus-Lite gameplay can reduce typical game duration, although it is usually longer than the Tokenz-free version due to the interactions caused by the Bonus Tokenz.",
+              "title": "Bonus-Lite Version: A streamlined variation of the Full gameplay (by vote of Players prior to the game’s start) so that the only Tokenz that are played with Letter Tiles are the Bonus Tokenz. Unlike Tokenz-free gameplay, the Bonus Tokenz in Bonus-Lite gameplay provide another path to points while also providing a lite strategic layer. Bonus-Lite gameplay can reduce typical game duration, although it is usually longer than the Tokenz-free version due to the interactions caused by the Bonus Tokenz.",
               "depth": 3,
               "blocks": [],
               "children": []
             },
             {
               "id": "1.1.4",
-              "title": "Action-Lite Version: A streamlined variation of the Full gameplay (by vote of Players prior to the game’s start) so that the only Tokenz that are played with Letter Tiles are the Action Tokenz. Unlike Tokenz-free and Bonus-Lite gameplay, the Action Tokenz in Action-Lite gameplay provide a \"lite\" strategic dimension. Action-Lite gameplay can reduce typical game duration, although it is usually longer than the Tokenz-free version due to the interactions caused by the Action Tokenz.",
+              "title": "Action-Lite Version: A streamlined variation of the Full gameplay (by vote of Players prior to the game’s start) so that the only Tokenz that are played with Letter Tiles are the Action Tokenz. Unlike Tokenz-free and Bonus-Lite gameplay, the Action Tokenz in Action-Lite gameplay provide a lite strategic dimension. Action-Lite gameplay can reduce typical game duration, although it is usually longer than the Tokenz-free version due to the interactions caused by the Action Tokenz.",
               "depth": 3,
               "blocks": [],
               "children": []
             },
             {
               "id": "1.1.5",
-              "title": "Freeplay Version: Similar to Tokenz-free gameplay except there is no scorekeeping. This provides a fun opportunity for creative vocabulary-building, where vocabulary \"experimentation\" is encouraged.",
+              "title": "Freeplay Version: Similar to Tokenz-free gameplay except there is no scorekeeping. This provides a fun opportunity for creative vocabulary-building, where vocabulary experimentation is encouraged.",
               "depth": 3,
               "blocks": [],
               "children": []
@@ -678,7 +734,7 @@ window.COJOINZ_DATA = {
         },
         {
           "id": "1.2",
-          "title": "Limited Modes: In standard (UNLIMITED) gameplay mode, the game's length depends on the quantity of Letter Tiles in the deck. With Limited Modes, Players may choose to limit the gameplay duration when playing any of the five versions of CoJoinz. Each of these three Limited Modes adjusts the gameplay, as follows:",
+          "title": "Limited Modes: In standard (unlimited) gameplay mode, the game's duration depends on the original quantity of Letter Tiles in the deck. When playing any of the five versions of CoJoinz, the gameplay duration may be adjusted by any of the three Limited Modes where Players agree to (any of these):",
           "depth": 2,
           "blocks": [],
           "children": [
@@ -689,15 +745,15 @@ window.COJOINZ_DATA = {
               "blocks": [
                 {
                   "type": "paragraph",
-                  "text": "Players agree to specify the timed duration of any game (usually in increments of 15-30 minutes) where the Scorekeeper sets a countdown timer for the agreed duration. Once elapsed, each Player plays their final turn, with game conclusion and final scoring occuring in the following way:"
+                  "text": "Choose a specific time duration (usually in increments of 10 or 15 minutes), and the Scorekeeper sets a countdown timer for the agreed duration. Once the timer sounds, each Player will play their final turn, and the game ends and is scored in the following way:"
                 },
                 {
                   "type": "paragraph",
-                  "text": "The current Active Player will finish their turn, and all other Players will have one final turn."
+                  "text": "The current Active Player will finish their turn (this is their final turn), and all other Players will have one final turn."
                 },
                 {
                   "type": "paragraph",
-                  "text": "The “Game-End\" boost points will not be awarded."
+                  "text": "The Game-End boost points will not be awarded to any Player."
                 }
               ],
               "children": []
@@ -709,7 +765,7 @@ window.COJOINZ_DATA = {
               "blocks": [
                 {
                   "type": "paragraph",
-                  "text": "Players may specify the quantity of any game's rounds instead of leaving it dependent upon the quantity of Letter Tiles. Here, the Scorekeeper sets the Round Counter to the agreed quantity. Once elapsed, each Player plays their final turn, while game conclusion and final scoring will occur in the same way as in Time-limited mode."
+                  "text": "Choose a specific quantity of game rounds. Here, the Scorekeeper sets the Round Counter to the agreed quantity (usually increments of 5). Once elapsed, the buzzer will sound and each Player will play their final turn, and the game ends and is scored in the same way as in Time-limited mode."
                 }
               ],
               "children": []
@@ -721,7 +777,7 @@ window.COJOINZ_DATA = {
               "blocks": [
                 {
                   "type": "paragraph",
-                  "text": "Players agree to use a reduced quantity of Letter Tiles in the Letter Tile deck. This may be done by agreeing to a specific quantity (then counting out that quantity), or more commonly, each Player grabs a single handful of Letter Tiles from the full deck pouch and deposits them into the \"backup\" pouch for this purpose. With this smaller quantity of Letter Tiles, gameplay proceeds as in Full gameplay and final scoring will occur in the default manner (including the \"Game-End\" boost)."
+                  "text": "Choose a reduced quantity of Letter Tiles in the Letter Tile deck. Usually, once all Players have grabbed a single handful of Letter Tiles, the reduced quantity are deposited into the Letter Tiles draw pouch (the unused Letter Tiles are placed in a backup location). Alternatively, Players may prefer to specify a quantity and then count out that quantity. Gameplay proceeds as in Full gameplay and final scoring will occur in the usual manner (including the \"Game-End\" boost to the Player who goes out first)."
                 }
               ],
               "children": []
@@ -749,7 +805,7 @@ window.COJOINZ_DATA = {
                 },
                 {
                   "id": "1.3.1.2",
-                  "title": "Game Mode: whether UNLIMITED or LIMITED MODE",
+                  "title": "Game Mode: whether UNLIMITED or Limited Mode",
                   "depth": 4,
                   "blocks": [],
                   "children": []
@@ -767,12 +823,19 @@ window.COJOINZ_DATA = {
                   "depth": 4,
                   "blocks": [],
                   "children": []
+                },
+                {
+                  "id": "1.3.1.5",
+                  "title": "Baseline Letter Tiles Qty. [in all game versions]: choose between 5-10 baseline Letter Tiles. This is the quantity of Letter Tiles that each Player will hold in their hand/rack throughout the game before their Grid Play and after refilling their hand. More Letter Tiles generally provide more (and longer) word possibilities per turn, while fewer Letter Tiles will often increase Grid Play creativity, decrease word length, and often increases the pace of the game (by decreasing each Player’s turn duration and increasing the overall quantity of turns throughout the game).",
+                  "depth": 4,
+                  "blocks": [],
+                  "children": []
                 }
               ]
             },
             {
               "id": "1.3.2",
-              "title": "Assembly: the Scorekeeper will use the official CoJoinz Scorz tool to set up the player names; and the remaining players may assemble and shuffle the LETTER Tiles deck, Bonus Tokenz deck, and the Action Tokenz deck.",
+              "title": "Assembly: the Scorekeeper will use the official CoJoinz Scorz tool to set up the player names; and the other players may assemble and shuffle the Letter Tiles deck, Bonus Tokenz deck, and the Action Tokenz deck (as applicable).",
               "depth": 3,
               "blocks": [],
               "children": []
@@ -787,21 +850,21 @@ window.COJOINZ_DATA = {
           "children": [
             {
               "id": "1.4.1",
-              "title": "Letter Tiles: starting to the left of the Scorekeeper, each Player will blindly select 1 Letter Tile from the deck at a time, in rotation. [Players will maintain 7 LETTER Tiles in their hand at all times until the draw deck is depleted]",
+              "title": "Letter Tiles: starting with the first Player to the left of the Scorekeeper, each Player will randomly select one Letter Tile from the deck (one-at-a-time), in rotation until all Players have the agreed baseline of Letter Tiles.",
               "depth": 3,
               "blocks": [],
               "children": []
             },
             {
               "id": "1.4.2",
-              "title": "Starting Action Tokenz [Full and Action-Lite Versions only]: Per the vote results, each Player (starting to the left of the Scorekeeper) will draw 2-5 Action Tokenz from the draw deck.",
+              "title": "Starting Action Tokenz [Full and Action-Lite Versions only]: Per the vote results, each Player (starting to the left of the Scorekeeper) will collectively draw 2-5 Action Tokenz from the draw deck.",
               "depth": 3,
               "blocks": [],
               "children": []
             },
             {
               "id": "1.4.3",
-              "title": "Starting Bonus Tokenz [Full and Bonus-Lite Versions only]: Per the vote results, each Player (starting to the left of the Scorekeeper) will draw 2-5 Bonus Tokenz from the draw deck.",
+              "title": "Starting Bonus Tokenz [Full and Bonus-Lite Versions only]: Per the vote results, each Player (starting to the left of the Scorekeeper) will collectively draw 2-5 Bonus Tokenz from the draw deck.",
               "depth": 3,
               "blocks": [],
               "children": []
@@ -810,7 +873,7 @@ window.COJOINZ_DATA = {
         },
         {
           "id": "1.5",
-          "title": "First Turn: The Player to the left of the Scorekeeper takes the first turn; play then continues clockwise (see 5.1).",
+          "title": "First Turn: The first Player to the left of the Scorekeeper takes the first turn; play then continues clockwise (unless changed by Action Tokenz - see 5.1).",
           "depth": 2,
           "blocks": [],
           "children": []
@@ -824,7 +887,7 @@ window.COJOINZ_DATA = {
       "blocks": [
         {
           "type": "paragraph",
-          "text": "CoJoinz Letterz has two types of Tokenz that each effect gameplay very differently and make CoJoinz Letterz a highly exciting and unique game. The individual Player's use of all Tokenz is purely optional, as Players may sometimes wish to maximize the game's excitement and variety or they may choose a simplified approach. When Tokenz are played, the typical gameplay flow is: Action Tokenz -> Grid Play (word-building with Letter Tiles) -> Bonus Tokenz; however, both Tokenz types do not need to be played together in the same turn, and some special Tokenz may only be played outside of a Player's turn."
+          "text": "CoJoinz Letterz has two types of Tokenz that each effect gameplay very differently and make CoJoinz Letterz a uniquely exciting game. The individual Player's use of Tokenz is purely optional, and when Tokenz are played, the typical gameplay flow is: Action Tokenz -> Grid Play (word-building with Letter Tiles) -> Bonus Tokenz; however, both Tokenz types do not need to be played together in the same turn, and some special Tokenz may only be played outside of a Player's turn."
         }
       ],
       "children": [
@@ -836,482 +899,363 @@ window.COJOINZ_DATA = {
           "children": [
             {
               "id": "2.1.1",
-              "title": "Action: Action Tokenz add \"spice\" to CoJoinz Letterz by offering more than 40 different types of distinct interactive actions that dramatically change the gameplay from its classic word-building roots. When (optionally) played, standard Action Tokenz are played before Letter Tiles are played in Grid Play. For even more unpredictable enjoyment, there are eight very special Action Tokenz (called \"Anytime\" Action Tokenz) that Players may choose to play at any time during the gameplay (outside their turn).",
+              "title": "ACTION: Action Tokenz are the “secret sauce” to CoJoinz Letterz by offering nearly 40 distinct interactive actions that dramatically change the gameplay from its classic word-building roots. Standard Action Tokenz are used before Letter Tiles are played in Grid Play. There is also a special group of eight Action Tokenz (collectively called \"Anytime\" Action Tokenz) that Players may choose to play at any time outside their turn.",
               "depth": 3,
               "blocks": [
                 {
                   "type": "table",
-                  "caption": "ACTION Tokenz — full list",
+                  "caption": "ACTION Tokenz - Full List (with Functions, Play Points, and Hand Points):",
                   "headers": [
-                    "ACTION TOKEN",
-                    "TYPE",
-                    "FUNCTIONS",
-                    "COUNT",
-                    "QTY (1-3P)",
-                    "QTY (4-6P)",
-                    "PLAY PTS",
-                    "HAND PTS"
+                    "ACTION TOKENZ\nNAME",
+                    "GAMEPLAY\nTYPE",
+                    "GAMEPLAY\nFUNCTION",
+                    "PLAY\nPOINTS",
+                    "HAND\nPOINTS",
+                    "COUNT\n38",
+                    "QTY\n156"
                   ],
                   "rows": [
                     [
                       "AXIS LOCK",
                       "Standard",
-                      "When played, all new Letter Tiles for one round must be placed along the single axis (either X or Y) chosen by the Active Player, starting with the Active Player’s turn and lasting for one complete round; this Action Tokenz is returned to the issuing Player's Action Tokenz discard pile after expiration (completion of the entire round).",
-                      "1",
-                      "2",
-                      "4",
+                      "All new Letter Tiles for one round must be placed along the single axis (either X or Y) chosen by the Active Player, starting with the Active Player’s turn and lasting for one complete round; this Action Tokenz is returned to the issuing Player's Action Tokenz discard pile after expiration (completion of the entire round).",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "BACK ATCHU **",
                       "Anytime",
-                      "(**Anytime)  When any Player targets you with an adverse Action Tokenz (such as a \"BLOCK\", “BURN”, “SKIP”, “STEAL Bonus”, or \"TAX\"), BACK ATCHU flips the effect back onto that Player while protecting you (like a shield) from that action. Unlike standard Action Tokenz, the issuing Player may play an owned \"BACK ATCHU\" Action Tokenz anytime (without waiting for their turn) during any Targeted Player's turn.",
-                      "1",
-                      "2",
-                      "4",
+                      "(**Anytime)  When any Player targets you with an adverse Action Tokenz (such as a \"BLOCK\", “BURN”, “SKIP”, “STEAL Bonus”, or \"TAX\"), BACK ATCHU flips the effect back onto that Player while protecting you from that action. Unlike standard Action Tokenz, the issuing Player may play a \"BACK ATCHU\" Action Tokenz anytime (without waiting for their turn) during any Targeted Player's turn.",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "BLAST",
                       "Standard",
-                      "aka: \"TOTAL RESET\": Totally wipes the Grid clean of Letter Tiles. Before advancing to the next Player's turn, Players vote to either discard all blasted Letter Tiles or to shuffle them into the Letter Tile draw pile.",
-                      "1",
-                      "1",
-                      "2",
+                      "aka: \"TOTAL RESET\": Totally wipes the Grid clean of Letter Tiles. Before advancing to the next Player's turn, Players vote to either discard all blasted Letter Tiles or to shuffle them into the Letter Tile draw pile. [Scorekeeper breaks ties]",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "2"
                     ],
                     [
                       "BLOCK **",
                       "Anytime",
-                      "(**Anytime)  Permits Active Player to block one finished Grid word of any Target, who must then attempt a second Grid word or Pass/Exchange for their turn. Unlike standard Action Tokenz, the issuing Player may play an owned \"BLOCK\" Action Tokenz anytime (without waiting for their turn) during any Targeted Player's turn. This Action Tokenz may be reversed (unblocked, in this case) via the use of a \"Back Atchu\" Action Tokenz (but not a \"HEAL\" Action Tokenz, as these are limited to \"BURN\" Action Tokenz).",
-                      "1",
-                      "2",
-                      "4",
+                      "(**Anytime)  Permits the Active Player to block one finished Grid word of any Target, who must then attempt a second Grid word or Pass/Exchange for their turn. Unlike standard Action Tokenz, the issuing Player may play this Action Tokenz anytime (without waiting for their turn) during any Targeted Player's turn. This Action Tokenz may be reversed (unblocked, in this case) via the use of a \"Back Atchu\" Action Tokenz (but not a \"HEAL\" Action Tokenz, as these are limited to \"BURN\" Action Tokenz).",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
-                      "BONUS PARCEL **",
+                      "BONUS FAVOR **",
                       "Anytime",
-                      "(**Anytime)  Permits Active Player to choose any of their Bonus Tokenz for a \"package\" to any Target Player whose final points tally did not include a Bonus Tokenz of their own. The Target's points are then re-tallied to include the effect of the Bonus. Unlike with other Action Tokenz, the issuing Player may play an owned \"Bonus GIFT\" Action Tokenz anytime (without waiting for their turn) at the end of any qualifying Targeted Player's turn.",
-                      "1",
-                      "2",
-                      "4",
+                      "(**Anytime)  Permits the Active Player to choose any of their Bonus Tokenz as a \"gift\"/favor for any Targeted Player whose final points tally did not include a Bonus Tokenz of their own. The Targeted Player's points are immediately re-tallied to include the effect of the Bonus Tokenz (the Bonus may not be refused). Unlike standard Action Tokenz, the issuing Player may play this Action Tokenz anytime (without waiting for their turn) at the end of any qualifying Targeted Player's turn.",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "BURN **",
                       "Anytime",
-                      "(**Anytime)  Converts the Targeted Player’s total turn point value (including Bonus Tokenz and PERFECT TURN boosts) into deducted points. Unlike standard Action Tokenz, the issuing Player may play an owned \"BURN\" Action Tokenz anytime (without waiting for their turn) on any Targeted Player who just completed their turn and tallied their score (before the next Player begins their turn).",
-                      "1",
-                      "2",
-                      "4",
+                      "(**Anytime)  Converts the Targeted Player’s total turn point value (including Bonus Tokenz and PERFECT TURN boosts) into deducted points. Unlike standard Action Tokenz, the issuing Player may play this Action Tokenz anytime (without waiting for their turn) on any Targeted Player who just completed their turn and tallied their score (before the next Player begins their turn).",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "CHANGE 2 WILDs",
                       "Standard",
                       "Active Player may move one Wild Letter Tile for another on the Grid, subject to the word validity rule.",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "COPY CAT",
                       "Standard",
                       "The Active Player copies the exact Action Tokenz played by the most recent player in rotation (as shown in their Action Tokenz discard pile adjacent to their game game rack), and resolves it immediately.",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "GIVE ACTION(s)",
                       "Standard",
                       "Active Player chooses which Target Player(s) receive any 1-3 Action Tokenz(s) that are blindly chosen by the Target.",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "GIVE BONUS(es)",
                       "Standard",
                       "Active Player chooses which Target Player(s) receive any 1-3 Bonus Tokenz(s) that are blindly chosen by the Target.",
-                      "1",
-                      "3",
-                      "6",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "6"
                     ],
                     [
                       "GO AGAIN",
                       "Standard",
                       "Active Player takes a complete second turn immediately after refreshing their hand from their first turn.",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "HEAL **",
                       "Anytime",
-                      "(**Anytime)  Undoes ('heals') the action of a “BURN” Action Tokenz that has been played on the Targeted Player. Unlike with most Action Tokenz, the issuing Player may play an owned \"HEAL\" Tokenz anytime (without waiting for their turn) on any Targeted Player who just received a \"BURN\" Action Tokenz.",
-                      "1",
-                      "2",
-                      "4",
+                      "(**Anytime)  Undoes ('heals') the action of a “BURN” Action Tokenz that has been played on the Targeted Player. Unlike standard Action Tokenz, the issuing Player may play this Action Tokenz anytime (without waiting for their turn) on any Targeted Player who just received a \"BURN\" Action Tokenz.",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "HEAL + KARMA **",
                       "Anytime",
-                      "(**Anytime)  Undoes ('heals') the action of a “BURN” Action Tokenz that has been played on the Targeted Player AND RETURNS the BURN by reversing the most recent (prior) score of the “burning” Player. Unlike most Action Tokenz, the issuing Player may play an owned \"HEAL & KARMA\" Action Tokenz anytime (without waiting for their turn) on any Targeted Player who just received a \"BURN\" Action Tokenz.",
-                      "1",
-                      "2",
-                      "4",
+                      "(**Anytime)  Undoes ('heals') the action of a “BURN” Action Tokenz that has been played on the Targeted Player AND RETURNS the BURN by reversing the most recent (prior) score of the “burning” Player. Unlike standard Action Tokenz, the issuing Player may play this Action Tokenz anytime (without waiting for their turn) on any Targeted Player who just received a \"BURN\" Action Tokenz.",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "HOLD **",
                       "Anytime",
-                      "(**Anytime)  Player may place a spare Letter Tile (drawn from the draw pile) face-down at any Grid position to reserve that Grid spot for their next turn's use. Unlike most Action Tokenz, the issuing Player may play an owned \"HOLD\" Action Tokenz anytime (without waiting for their turn); this HOLD action has a \"Use It or Lose It\" condition and will expire upon the issuing Player's next turn, whereupon the spare Letter Tile is returned to the Letter Tile draw pile.",
-                      "1",
-                      "",
-                      "4",
+                      "(**Anytime)  Player may place a spare Letter Tile (drawn from the draw pile) face-down at any Grid position to reserve that Grid spot for their next turn's use. Unlike standard Action Tokenz, the issuing Player may play this Action Tokenz anytime (without waiting for their turn); this HOLD action has a \"Use It or Lose It\" condition and will expire upon the issuing Active Player's next turn, then the spare Letter Tile is returned to the Letter Tile draw pile.",
                       "0",
-                      "10"
-                    ],
-                    [
-                      "MOVE ? TILES",
-                      "Standard",
-                      "The Active Player may relocate any quantity of current Grid tiles, as a substitute for or in combination with their own Letter Tile(s) in their newly formed words, subject to the Word Validity rule. The words that remain (from which Letter Tiles were removed) do not count as valid Grid Play for points, as the only points that are earned are from the Active Player's newly-formed words.",
+                      "10",
                       "1",
-                      "",
-                      "4",
-                      "0",
-                      "10"
+                      "4"
                     ],
                     [
                       "MOVE 1 TILE",
                       "Standard",
-                      "The Active Player may relocate any single current Grid tile to use it in their newly formed word, subject to Word Validity rule. The words that remain (from which Letter Tiles were removed) do not count as valid Grid Play for points, as the only points that are earned are from the Active Player's newly-formed words.",
-                      "1",
-                      "2",
-                      "4",
+                      "In addition to (but not as a substitution for) using Letter Tile(s) from their own hand, the Active Player may relocate any single current Grid tile to use in their newly-formed word, subject to Word Validity rule. The word(s) from which any Letter Tiles were REMOVED do not count as Grid Play for points; points are earned only from the Active Player's newly-formed word(s) that include all of the Active Player's Letter Tiles (from their hand) as well as the MOVED Letter Tile. [The moved Letter Tile acts only as an extra Letter Tile to that of the Active Player's own Letter Tile(s), and it may only be used in standard Grid Play manner to form new word(s).]",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "NEW HAND",
                       "Standard",
-                      "The Active Player discards up to 7 of their Letter Tiles and receives replacements, then play advances to the next Player in rotation. Counts as the Active Player's turn but as an Exchange turn.",
-                      "1",
-                      "4",
-                      "4",
+                      "The Active Player discards (returns to the draw pile) up to 7 of their Letter Tiles and receives replacements, then play advances to the next Player in rotation. Counts as the Active Player's turn but as an Exchange turn.",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "NEW HAND +",
                       "Standard",
-                      "The Active Player discards up to 7 of their Letter Tiles and receives replacements, then the Active Player may also play Letter Tiles and Bonus Tokenz per normal play. Does not count as an Exchange turn.",
-                      "1",
-                      "2",
-                      "4",
+                      "The Active Player discards (returns to the draw pile) up to 7 of their Letter Tiles and receives replacements, then the Active Player may also play Letter Tiles and Bonus Tokenz per normal Grid play. This does not count as an Exchange turn.",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "NEW T-PAIR",
                       "Standard",
                       "The Active Player earns 1 new T-PAIR (1 Action Tokenz and 1 Bonus Tokenz), not subject to the T-PAIR Share rule (unshared).",
-                      "1",
-                      "4",
-                      "8",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "8"
                     ],
                     [
                       "REMOVE 1 TILE",
                       "Standard",
                       "The Active Player discards any top single tile of any 1 stack; revealing the underlying layer. The Active Player is not obligated to play within the removed Grid string.  \"REMOVE\" Action Tokenz are the only Tokenz that are not subject to the Word Validity rule for surviving Grid Letters.",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "REMOVE 1 WORD",
                       "Standard",
                       "The Active Player discards all top-layer tiles from one continuous word. \"REMOVE\" Action Tokenz are the only Tokenz that are not subject to the Word Validity rule for surviving Grid Letters.",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "REMOVE 2 TILES",
                       "Standard",
                       "The Active Player discards one top tile each from any 2 stacks within one Grid Word, or two tiles from one stack within one Grid Word.  \"REMOVE\" Action Tokenz are the only Tokenz that are not subject to the Word Validity rule for surviving Grid Letters.",
-                      "1",
-                      "1",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "REMOVE 3 TILES",
                       "Standard",
                       "The Active Player discards one top tile each from any 3 stacks within one Grid Word, or two tiles from one stack within any one Grid Word.  \"REMOVE\" Action Tokenz are the only Tokenz that are not subject to the Word Validity rule for surviving Grid Letters.",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "REVERSE",
                       "Standard",
-                      "Flips direction of play from CW to CCW (or vice versa). In 2-Player games, this Tokenz acts to skip the Active Player's turn (with zero points scored).",
-                      "1",
-                      "2",
-                      "4",
+                      "Flips direction of play from CW (default) to CCW (or vice versa). In 2-Player games, this Tokenz acts to skip the Active Player's turn (with zero points scored).",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "SCATTER PLAY",
                       "Standard",
                       "The Active Player plays up to 3 of their Letter Tiles any place on the Grid as long as they connect to existing words (if Letter Tiles exist on the Grid), but they do not need to be played in the same word string(s) as required in standard Grid Play.  All newly-formed words must follow the Word Validity rule.",
-                      "1",
-                      "",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "SKIP TURN",
                       "Standard",
                       "Skips the Targeted Player’s next turn in rotation. The Active Player will place this Tokenz (sideways) in front of the Targeted Player to clearly mark them, and it will be placed on the Active Player's Action Tokenz discard pile once the Targeted Player's turn has been skipped. This Action Tokenz may be reversed (\"unskipped\", in this case) via the use of a \"Back Atchu\" Action Tokenz (but not a \"HEAL\" Action Tokenz, as these are limited to \"BURN\" Action Tokenz).",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "STEAL 1 ACTION",
                       "Standard",
-                      "Active Player blindly steals 1 Action Tokenz from their Target Player.",
-                      "1",
-                      "2",
-                      "4",
+                      "The Active Player blindly steals 1 Action Tokenz from their Target Player.",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "STEAL 1 BONUS",
                       "Standard",
-                      "Active Player blindly steals 1 Bonus Tokenz from their Target Player.",
-                      "1",
-                      "2",
-                      "4",
+                      "The Active Player blindly steals 1 Bonus Tokenz from their Target Player.",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "STEAL 3 ACTION(s)",
                       "Standard",
-                      "Active Player blindly steals 1-3 Action Tokenz(s) from their Target Player (only one Player may be the Target).",
-                      "1",
-                      "2",
-                      "4",
+                      "The Active Player blindly steals 1-3 Action Tokenz(s) from their Target Player (only one Player may be the Target).",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "STEAL 3 BONUS(es)",
                       "Standard",
-                      "Active Player blindly steals 1-3 Bonus Tokenz(s) from their Target Player (only one Player may be the Target).",
-                      "1",
-                      "2",
-                      "4",
+                      "The Active Player blindly steals 1-3 Bonus Tokenz(s) from their Target Player (only one Player may be the Target).",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "SWAP - BONUSes",
                       "Standard",
                       "The Active Player will identify their first chosen Target Player and their chosen quantity of Bonus Tokenz, and both Players will blindly swap their Bonus Tokenz accordingly; then Active Player will repeat for their subsequent Target Player(s), once per Target Player. (Bonus Tokenz quantities quantities for each Target Player do not need to match)  (No Bonus Tokenz are swapped with Players who currently own none.)",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "SWAP- ACTIONs",
                       "Standard",
                       "The Active Player will identify their first chosen Target Player(s) and their chosen quantity of Action Tokenz, and both Players will blindly swap their Action Tokenz accordingly; then, the Active Player will repeat for their subsequent Target Player(s), once per Target Player. (Action Tokenz quantities for each Target Player do not need to match)  (No Action Tokenz are swapped with Players who currently own none.)",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "SWAP- TILEs",
                       "Standard",
                       "The Active Player will identify their first chosen Target Player and their chosen quantity of Letter Tiles, and both Players will blindly swap their Letter Tiles accordingly; then, repeat for each of the Active Player’s subsequent chosen Target Player(s), once per Target Player. (Letter Tile quantities for each Target Player do not need to match)",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "SWITCH WILD TILE",
                       "Standard",
                       "Active Player may switch one Wild Letter Tile on the Grid with an equivalent Letter Tile from their hand; this Wild Letter Tile may either be used in that current turn or saved for future use. This only applies to one-tile switches, so the equivalent Letter Tile must not change the original quantity of Grid Tiles in the affected word string. This would permit, for instance, switching a \"TH\" Letter Tile in one's hand for a Wild Letter Tile that is currently in place on the Grid for \"TH\" letters.",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
-                    ],
-                    [
-                      "TAX |  5 PTS **",
-                      "Anytime",
-                      "(**Anytime)  Deducts a flat 5 points from the Targeted Player's final turn total. Unlike most Action Tokenz, the issuing Player may play an owned \"TAX\" Action Tokenz anytime (without waiting for their turn) on any Targeted Player who just completed their turn and tallied their score (before the next Player begins their turn). This Action Tokenz may be reversed via the use of a \"Back Atchu\" Action Tokenz (but not a \"HEAL\" Action Tokenz, as these are limited to \"BURN\" Action Tokenz).",
+                      "10",
                       "1",
-                      "1",
-                      "8",
-                      "0",
-                      "10"
-                    ],
-                    [
-                      "TAX | 10 PTS **",
-                      "Anytime",
-                      "(**Anytime)  Deducts a flat 10 points from the Targeted Player's final turn total. Unlike most Action Tokenz, the issuing Player may play an owned \"TAX\" Action Tokenz anytime (without waiting for their turn) on any Targeted Player who just completed their turn and tallied their score (before the next Player begins their turn). This Action Tokenz may be reversed via the use of a \"Back Atchu\" Action Tokenz (but not a \"HEAL\" Action Tokenz, as these are limited to \"BURN\" Action Tokenz).",
-                      "1",
-                      "4",
-                      "6",
-                      "0",
-                      "10"
-                    ],
-                    [
-                      "TAX | 10% **",
-                      "Anytime",
-                      "(**Anytime)  Deducts 10% of the Targeted Player's final turn total, including any Bonus Tokenz played (rounded up to the nearest 5 or 10 points). Unlike standard Action Tokenz, the issuing Player may play an owned \"TAX\" Action Tokenz anytime (without waiting for their turn) on any Targeted Player who just completed their turn and tallied their score (before the next Player begins their turn). This Action Tokenz may be reversed via the use of a \"Back Atchu\" Action Tokenz (but not a \"HEAL\" Action Tokenz, as these are limited to \"BURN\" Action Tokenz).",
-                      "1",
-                      "2",
-                      "4",
-                      "0",
-                      "10"
-                    ],
-                    [
-                      "TAX | 15 PTS **",
-                      "Anytime",
-                      "(**Anytime)  Deducts a flat 15 points from the Targeted Player's final turn total. Unlike most Action Tokenz, the issuing Player may play an owned \"TAX\" Action Tokenz anytime (without waiting for their turn) on any Targeted Player who just completed their turn and tallied their score (before the next Player begins their turn). This Action Tokenz may be reversed via the use of a \"Back Atchu\" Action Tokenz (but not a \"HEAL\" Action Tokenz, as these are limited to \"BURN\" Action Tokenz).",
-                      "1",
-                      "3",
-                      "4",
-                      "0",
-                      "10"
-                    ],
-                    [
-                      "TAX | 20 PTS **",
-                      "Anytime",
-                      "(**Anytime)  Deducts a flat 20 points from the Targeted Player's final turn total. Unlike standard Action Tokenz, the issuing Player may play an owned \"TAX\" Action Tokenz anytime (without waiting for their turn) on any Targeted Player who just completed their turn and tallied their score (before the next Player begins their turn). This Action Tokenz may be reversed via the use of a \"Back Atchu\" Action Tokenz (but not a \"HEAL\" Action Tokenz, as these are limited to \"BURN\" Action Tokenz).",
-                      "1",
-                      "2",
-                      "4",
-                      "0",
-                      "10"
-                    ],
-                    [
-                      "TAX | 25% **",
-                      "Anytime",
-                      "(**Anytime)  Deducts 25% of the Targeted Player's final turn total, including any Bonus Tokenz played (rounded up to the nearest 5 or 10 points). Unlike standard Action Tokenz, the issuing Player may play an owned \"TAX\" Action Tokenz anytime (without waiting for their turn) on any Targeted Player who just completed their turn and tallied their score (before the next Player begins their turn). This Action Tokenz may be reversed via the use of a \"Back Atchu\" Action Tokenz (but not a \"HEAL\" Action Tokenz, as these are limited to \"BURN\" Action Tokenz).",
-                      "1",
-                      "2",
-                      "4",
-                      "0",
-                      "10"
-                    ],
-                    [
-                      "TAX | 50% **",
-                      "Anytime",
-                      "(**Anytime)  Deducts 50% of the Targeted Player's final turn total, including any Bonus Tokenz played (rounded up to the nearest 5 or 10 points). Unlike standard Action Tokenz, the issuing Player may play an owned \"TAX\" Action Tokenz anytime (without waiting for their turn) on any Targeted Player who just completed their turn and tallied their score (before the next Player begins their turn). This Action Tokenz may be reversed via the use of a \"Back Atchu\" Action Tokenz (but not a \"HEAL\" Action Tokenz, as these are limited to \"BURN\" Action Tokenz).",
-                      "1",
-                      "2",
-                      "2",
-                      "0",
-                      "10"
+                      "4"
                     ],
                     [
                       "TEAM WORK",
                       "Standard",
                       "Starts a \"TEAM Turn\" where all Players (as \"Partners\") pool all of their Letter Tiles by placing them in front of their game rack (facing away). Partners seek to create the best possible Grid Play based on their collective Letter Tiles and the Grid's Letter Tiles. The Leader has the final say as to the final Grid Play.",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "TRADE TIME",
-                      "Standard",
+                      "Standard -  Special Session",
                       "SPECIAL SESSION that pauses Grid play. The Active Player publicly announces open trading among all Players) to enable all Players to trade Letter Tiles and/or Tokenz with one or more Players.",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "WAGER | ALL TILES",
-                      "Standard",
+                      "Standard -  Special Session",
                       "SPECIAL SESSION that pauses Grid play and starts a WAGER Session in which all Players will automatically participate. All Players will ante and then wager (one raise) with face-down Tokenz in their Wager Pool, based on the total of all 7 of their Letter Tiles. Based on the WAGER Session's Wagering Round's result (whose hand is called), the Player who recieved the final Call will announce their hand's total point value. If any competing Player has a higher hand point value, they will announce theirs; the Player declaring the highest-scoring hand will reveal their entire hand to the other Players, and the highest scoring hand wins. Players who Fold or Called (but who are not in the announced highest-hand contention) are not required to show any Letter Tiles in their hand.",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "WAGER | BEST TILE",
-                      "Standard",
+                      "Standard -  Special Session",
                       "SPECIAL SESSION that pauses Grid play and starts a WAGER Session in which all Players will automatically participate. All Players will ante and then wager (one raise) with face-down Tokenz in their Wager Pool, based on their Letter Tile that contains the highest-point value in their hand (the \"Best Tile\"). Based on the WAGER Session's Wagering Round's result (whose hand is called), the Player who recieved the final Call will announce their Best Tile's point value. If any competing Player has a Letter Tile with a higher point value, they will announce theirs; the Player declaring the highest-scoring hand will reveal their single highest-value tile to the other Players, and the highest scoring Letter Tile wins. Players who Fold or Called (but who are not in the announced highest-hand contention) are not required to show any Letter Tiles in their hand.",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ],
                     [
                       "WAGER | BEST WORD",
-                      "Standard",
+                      "Standard -  Special Session",
                       "SPECIAL SESSION that pauses Grid play and starts a WAGER Session in which all Players will automatically participate. All Players will ante and then wager (one raise) with face-down Tokenz in their Wager Pool, based on their hand's highest-point value word in their hand (the \"Best Word\"). Based on the WAGER Session's Wagering Round's result (whose hand is called), the Player who recieved the final Call will announce their Best Word's point value. If any competing Player has a word with a higher point value, they will announce theirs; the Player declaring the highest-scoring word will reveal these Letter Tiles to the other Players, and the highest scoring word wins. Players who Fold or Called (but who are not in the announced highest-hand contention) are not required to show any Letter Tiles in their hand.",
-                      "1",
-                      "2",
-                      "4",
                       "0",
-                      "10"
+                      "10",
+                      "1",
+                      "4"
                     ]
                   ]
                 }
@@ -1320,171 +1264,153 @@ window.COJOINZ_DATA = {
             },
             {
               "id": "2.1.2",
-              "title": "Bonus: Bonus Tokenz \"supercharge\" the scoring potential by adding 17 different ways to increase the points earned in Grid Play. When (optionally) played, Bonus Tokenz come as the last step in tallying Grid Play points.",
+              "title": "BONUS: Bonus Tokenz supercharge scoring potential by adding 17 different ways to increase the points earned in Grid Play. Bonus Tokenz are the last step in tallying Grid Play points.",
               "depth": 3,
               "blocks": [
                 {
                   "type": "table",
-                  "caption": "BONUS Tokenz — full list",
+                  "caption": "BONUS Tokenz - Full List (with Functions, Play Points, and Hand Points):",
                   "headers": [
-                    "BONUS TOKEN",
-                    "FUNCTIONS",
-                    "COUNT",
-                    "QTY (1-3P)",
-                    "QTY (4-6P)",
-                    "PLAY PTS",
-                    "HAND PTS"
+                    "BONUS TOKENZ\nNAME",
+                    "GAMEPLAY\nFUNCTION",
+                    "COUNT\n17",
+                    "QTY\n68",
+                    "PLAY\nPOINTS",
+                    "HAND\nPOINTS"
                   ],
                   "rows": [
                     [
                       "TILE 2x",
-                      "In ADDITION to the single selected Letter Tile's word-string point total, this BONUS token DOUBLES its point value. The Active Player may select ANY of the Letter Tiles in the entire word string that the Active Player modified in that turn (not limited to the Letter Tiles that the Active Player added to any existing Grid word).",
+                      "In ADDITION to the single selected Letter Tile's word-string point total, this doubles its point value. The Active Player may select any of the Letter Tiles in the entire word string that the Active Player modified in that turn (not limited to the Letter Tiles that the Active Player added to any existing Grid word). [By default, SCORZ will automatically select the highest-value Letter Tile]",
                       "1",
-                      "3",
                       "6",
                       "2x letter pts",
                       "10"
                     ],
                     [
                       "TILE 3x",
-                      "In ADDITION to the single selected Letter Tile's word-string point total, this BONUS token TRIPLES its point value. The Active Player may select ANY of the Letter Tiles in the entire word string that the Active Player modified in that turn (not limited to the Letter Tiles that the Active Player added to any existing Grid word).",
+                      "In ADDITION to the single selected Letter Tile's word-string point total, this triples its point value. The Active Player may select any of the Letter Tiles in the entire word string that the Active Player modified in that turn (not limited to the Letter Tiles that the Active Player added to any existing Grid word). [By default, SCORZ will automatically select the highest-value Letter Tile]",
                       "1",
-                      "2",
                       "4",
                       "3x letter pts",
                       "15"
                     ],
                     [
                       "STACK - ANY 1",
-                      "Adds the cumulative point value of all tiles (top and concealed) in any one selected stack within the Player's word string for that turn.",
+                      "Adds the cumulative point value of all tiles (top and concealed) in any one selected stack (of any type) within the Active Player's word string for that turn.",
                       "1",
-                      "2",
                       "4",
                       "1 stack (any)",
                       "20"
                     ],
                     [
                       "STACK - COMBI",
-                      "Adds the cumulative point value of all tiles (top and concealed) in any one COMBO LETTER stack within the Player's word string for that turn.",
+                      "Adds the cumulative point value of all tiles (top and concealed) in any one COMBI LETTER stack within the Active Player's word string for that turn.",
                       "1",
-                      "2",
                       "4",
                       "1 combo stack",
                       "20"
                     ],
                     [
                       "STACK - CONSO",
-                      "Adds the cumulative point value of all tiles (top and concealed) in any one CONSONANT stack within the Player's word string for that turn.",
+                      "Adds the cumulative point value of all tiles (top and concealed) in any one CONSONANT (single letter) stack within the Active Player's word string for that turn.",
                       "1",
-                      "2",
                       "4",
                       "1 conso stack",
                       "20"
                     ],
                     [
                       "STACK - VOWEL",
-                      "Adds the cumulative point value of all tiles (top and concealed) in any one VOWEL stack within the Player's word string for that turn.",
+                      "Adds the cumulative point value of all tiles (top and concealed) in any one VOWEL (single letter) stack within the Active Player's word string for that turn.",
                       "1",
-                      "2",
                       "4",
                       "1 vowel stack",
                       "20"
                     ],
                     [
                       "STACKS - ANY 2",
-                      "Adds the cumulative point value of all tiles (top and concealed) in any two selected stacks (if available) within the Player's word string for that turn.",
-                      "1",
+                      "Adds the cumulative point value of all tiles (top and concealed) in any two selected stacks (of any type, if available) within the Active Player's word string for that turn.",
                       "1",
                       "2",
                       "2 stacks (any)",
                       "30"
                     ],
                     [
-                      "TURN +10 PTS",
-                      "Adds a flat 10 points to final turn total",
+                      "TURN + 5 PTS",
+                      "Adds 5 points to the Active Player's Grid Play total.",
                       "1",
-                      "4",
+                      "8",
+                      "5",
+                      "5"
+                    ],
+                    [
+                      "TURN +10 PTS",
+                      "Adds 10 points to the Active Player's Grid Play total.",
+                      "1",
                       "8",
                       "10",
                       "10"
                     ],
                     [
                       "TURN +15 PTS",
-                      "Adds a flat 15 points to final turn total",
+                      "Adds 15 points to the Active Player's Grid Play total.",
                       "1",
-                      "3",
                       "6",
                       "15",
                       "15"
                     ],
                     [
                       "TURN +20 PTS",
-                      "Adds a flat 20 points to final turn total",
+                      "Adds 20 points to the Active Player's Grid Play total.",
                       "1",
-                      "2",
                       "4",
                       "20",
                       "20"
                     ],
                     [
                       "TURN +25 PTS",
-                      "Adds a flat 25 points to final turn total",
-                      "1",
+                      "Adds 25 points to the Active Player's Grid Play total.",
                       "1",
                       "2",
                       "25",
                       "25"
                     ],
                     [
-                      "TURN +5 PTS",
-                      "Adds a flat 5 points to final turn total",
-                      "1",
-                      "4",
-                      "8",
-                      "5",
-                      "5"
-                    ],
-                    [
                       "TURN 2x",
-                      "Doubles cumulative score of the current turn",
+                      "Doubles the Active Player's Grid Play total. [This is an aggregate, not a supplement, so the 2x is the total points for that turn.]",
                       "1",
-                      "3",
                       "3",
                       "2x turn pts",
                       "30"
                     ],
                     [
                       "TURN 3x",
-                      "Triples cumulative score of the current turn",
+                      "Triples the Active Player's Grid Play total. [This is an aggregate, not a supplement, so the 3x is the total points for that turn.]",
                       "1",
-                      "2",
                       "1",
                       "3x turn pts",
                       "40"
                     ],
                     [
                       "WILD WORD 2x",
-                      "DOUBLES the point value of any word-string(s) that contain a Wild Letter Tile in the entire word string(s) that the Active Player modified in that turn (not limited to one word-string). This 2x is aggregate (not supplemental) in that the total point value for the affected word string(s) is doubled, not 2x in addition to the raw word string(s) point value.",
+                      "Doubles the point value of any word-string(s) that contains a Wild Letter Tile in the entire word string(s) that the Active Player modified in that turn (not limited to one word-string). This 2x is aggregate (not supplemental) in that the total point value for the affected word string(s) is doubled, not 2x in addition to the raw word string(s) point value.",
                       "1",
-                      "",
                       "2",
                       "2x word(s) pts",
                       "30"
                     ],
                     [
                       "WORD 2x",
-                      "Doubles entire newly created/modified word string",
+                      "Doubles the point value of one newly-formed word in the Active Player's Grid Play. [By default, SCORZ will automatically select the highest-value word, if multiple words are formed]",
                       "1",
-                      "3",
                       "4",
                       "2x word pts",
                       "25"
                     ],
                     [
                       "WORD 3x",
-                      "Triples entire newly created/modified word string",
+                      "Triples the point value of one newly-formed word in the Active Player's Grid Play. [By default, SCORZ will automatically select the highest-value word, if multiple words are formed]",
                       "1",
-                      "2",
                       "2",
                       "3x word pts",
                       "35"
@@ -1498,68 +1424,68 @@ window.COJOINZ_DATA = {
         },
         {
           "id": "2.2",
-          "title": "Tokenz Earning:",
+          "title": "Earning Tokenz:",
           "depth": 2,
           "blocks": [
             {
               "type": "paragraph",
-              "text": "There are several pathways to obtaining Tokenz, and the most common pathways involve earning Tokenz in pairs (consisting of 1 Bonus Tokenz and 1 Action Tokenz) - called a \"T-PAIR\"."
+              "text": "There are several way to obtain Tokenz, and the most common ways involve earning Tokenz in pairs (consisting of 1 Bonus Tokenz and 1 Action Tokenz) - called a \"T-PAIR\"."
             }
           ],
           "children": [
             {
               "id": "2.2.1",
-              "title": "\"T-PAIR\" Process:",
+              "title": "“T-PAIR” Process:",
               "depth": 3,
               "blocks": [],
               "children": [
                 {
                   "id": "2.2.1.1",
-                  "title": "When a Player earns one or more T-PAIRs (the \"Earning Player\"), they blindly draw one Action Tokenz from its draw deck and then draw one Bonus Tokenz from its draw deck. This sequence is always followed, regardless of how many T-PAIRS the Player earns. In the Bonus-Lite and Action-Lite Versions, the Earning Player instead draws only one Tokenz of the type used in that version (Bonus or Action). Most often, immediately after each T-PAIR is drawn, something very special happens: it is called the \"T-PAIR Share\":",
+                  "title": "When a Player earns one or more T-PAIRs (the “Earning Player”), they blindly draw one Action Tokenz from its draw deck and then draw one Bonus Tokenz from its draw deck. This sequence is always followed, regardless of how many T-PAIRS the Player earns. In the Bonus-Lite and Action-Lite Versions, the Earning Player instead draws only one Tokenz of the type used in that version (Bonus or Action). Usually, immediately after each T-PAIR is drawn, something very special happens: it is called the \"T-PAIR Share\":",
                   "depth": 4,
                   "blocks": [],
                   "children": [
                     {
                       "id": "2.2.1.1.1",
-                      "title": "T-PAIR Share Rule: The Earning Player privately views both Tokenz from each T-PAIR and then chooses either one of the Tokenz to give to any other (one) Player of their choosing (the “Receiving Player”), while keeping the remaining Tokenz. Players may earn multiple T-PAIRS in each turn, and they will always use this one-T-PAIR-at-a-time sequence for the T-PAIR Share, regardless of how many T-PAIRS they earn.",
+                      "title": "T-PAIR Share Rule: The Earning Player privately views both Tokenz from each T-PAIR and then chooses either one of the Tokenz to give to any other individual Player (the “Recipient Player”), while keeping the remaining Tokenz. Players may earn multiple T-PAIRS in each turn, and they will always use this one-T-PAIR-at-a-time sequence for the T-PAIR Share, regardless of how many T-PAIRS they earn.",
                       "depth": 5,
                       "blocks": [],
                       "children": [
                         {
                           "id": "2.2.1.1.1.1",
-                          "title": "T-PAIR Share Exemptions:",
+                          "title": "Exemptions to the T-PAIR Share Rule:",
                           "depth": 6,
                           "blocks": [
                             {
                               "type": "paragraph",
-                              "text": "The following pathways do not follow the T-PAIR Share rule, as the Earning Player keeps all Tokenz:"
+                              "text": "The following do not follow the T-PAIR Share rule, as the receiving Player keeps all Tokenz:"
                             }
                           ],
                           "children": [
                             {
                               "id": "2.2.1.1.1.1.1",
-                              "title": "VALID WORD: In 2-Player games' Word Challenges, the Challenged Player keeps both Tokenz as a reward for winning the challenge (**see Rule 3.2.1)**; for games of 3+ Players, the T-PAIR Share rule applies.",
+                              "title": "VALID WORD: In 2-Player games' Word Challenges, the Challenged Player keeps both Tokenz as a reward for winning the challenge [see Rule 3.2.1]; for games of 3+ Players, the T-PAIR Share rule applies.",
                               "depth": 7,
                               "blocks": [],
                               "children": []
                             },
                             {
                               "id": "2.2.1.1.1.1.2",
-                              "title": "INVALID WORD: In 2-Player game's Word Challenges, the Challenging Player keeps both Tokenz as a reward for winning the challenge (**see Rule 3.2.2)**; for games of 3+ Players, the T-PAIR Share rule applies.",
+                              "title": "INVALID WORD: In 2-Player game's Word Challenges, the Challenging Player keeps both Tokenz as a reward for winning the challenge [see Rule 3.2.2]; for games of 3+ Players, the T-PAIR Share rule applies.",
                               "depth": 7,
                               "blocks": [],
                               "children": []
                             },
                             {
                               "id": "2.2.1.1.1.1.3",
-                              "title": "WAGER Session payoff: the Winning Player who won the payoff \"pot\" (see Rule 3.5.2.2.9)",
+                              "title": "WAGER Session payoff: the Winning Player who won the payoff \"pot\" keeps all Tokenz [see Rule 3.5.2.2.9]",
                               "depth": 7,
                               "blocks": [],
                               "children": []
                             },
                             {
                               "id": "2.2.1.1.1.1.4",
-                              "title": "“Bonus” Tokenz: Any Player who receives a Bonus Tokenz via a “STEAL A Bonus” or a “GIVE YOUR Bonus” Action Tokenz (these actions involve individualt Tokenz, not involve T-PAIRs, so then are not subject to the T-PAIR Share rule).",
+                              "title": "Certain Bonus Tokenz: Any Player who receives a Bonus Tokenz when “STEAL … Bonus” or a “GIVE Bonus(es)” Action Tokenz are played keeps all these Tokenz (these actions involve individual Tokenz, not T-PAIRs, so then are not subject to the T-PAIR Share rule).",
                               "depth": 7,
                               "blocks": [],
                               "children": []
@@ -1594,7 +1520,7 @@ window.COJOINZ_DATA = {
             },
             {
               "id": "2.3.2",
-              "title": "All used Bonus Tokenz get discarded into their dedicated discard pile.",
+              "title": "All used Bonus Tokenz get discarded face-up immediately next to each Player’s rack, adjacent to and separate from discarded Action Tokenz.",
               "depth": 3,
               "blocks": [],
               "children": []
@@ -1623,13 +1549,13 @@ window.COJOINZ_DATA = {
           "blocks": [
             {
               "type": "paragraph",
-              "text": "All words, including those that intersect with any newly-played Grid Words, must be valid words per the official CoJoinz lexicon provided for all Players, called \"WordScanz\". Players will use the CoJoinz WordScanz app/tool as the sole source for judging valid words."
+              "text": "All words, including those that intersect with any newly-played Grid Words, must be valid words per the only permitted lexicon resource for CoJoinz Letterz, the \"WordScanz\" tool. Players will use the WordScanz app/tool as the sole source for judging valid words and for optimizing Grid Play."
             }
           ],
           "children": [
             {
               "id": "3.1.1",
-              "title": "Word Lookups: In addition to providing loads of fun, CoJoinz Letterz is intended to provide a vocabulary-building benefit. So, all Players are encouraged to actively check word validity and/or gameplay options at any time (and for any quantity of times) prior to their turn. But, as a courtesy to other Players (so as not to create an unfair delay), word lookups should not be done during one's turn.",
+              "title": "Word Lookups: In addition to providing tons of fun, CoJoinz Letterz is an excellent way to build one’s vocabulary.  So, all Players are encouraged to pro-actively check word validity and/or gameplay options at any time **prior to their turn**; word lookups during one’s turn would create an unfair delay.",
               "depth": 3,
               "blocks": [],
               "children": []
@@ -1691,13 +1617,13 @@ window.COJOINZ_DATA = {
           "children": [
             {
               "id": "3.3.1",
-              "title": "Stacking Duplication & \"Sealing\": Players are not allowed to stack exactly-duplicate Letter tiles, but there is a process called \"Wild tile Sealing\" that may seem to ignore this rule against duplicates:",
+              "title": "Stacking Duplication & \"Sealing\": Players are not allowed to stack exactly-duplicate Letter Tiles (or Wild tiles) during Grid Play, but there is a special condition related to this rule, called \"Wild tile Sealing\":",
               "depth": 3,
               "blocks": [],
               "children": [
                 {
                   "id": "3.3.1.1",
-                  "title": "\"Sealing\" a Wild tile: for example in the word \"J-U-M-P\", placing a “J” Letter Tile on top of a Wild tile that is currently representing the letter “J” is permitted even though the resulting word hasn't changed. This process is called \"Sealing\"/to \"Seal\" the Wild tile.",
+                  "title": "\"Sealing\" a Wild tile: for example in the word \"J-U-M-P\", placing a “J” Letter Tile on top of a Wild tile that is currently standing in for the letter “J” is permitted even though the resulting word hasn't changed. This process is called \"Wild tile Sealing\", and the Player is given full credit for all points in that Grid Play.",
                   "depth": 4,
                   "blocks": [],
                   "children": []
@@ -1736,7 +1662,7 @@ window.COJOINZ_DATA = {
               "blocks": [
                 {
                   "type": "paragraph",
-                  "text": "The following \"Anytime\" Action Tokenz may be played at any time outside of a Player's turn, and they do NOT count against a Player’s next in-turn limit:"
+                  "text": "The following \"Anytime\" Action Tokenz may be played at any time outside of a Player's turn (but NOT during the Active Player’s turn), and they do NOT count against a Player’s next in-turn limit:"
                 },
                 {
                   "type": "paragraph",
@@ -1748,7 +1674,7 @@ window.COJOINZ_DATA = {
                 },
                 {
                   "type": "paragraph",
-                  "text": "\"BONUS PARCEL\""
+                  "text": "\"BONUS FAVOR\""
                 },
                 {
                   "type": "paragraph",
@@ -1765,10 +1691,6 @@ window.COJOINZ_DATA = {
                 {
                   "type": "paragraph",
                   "text": "\"HOLD\""
-                },
-                {
-                  "type": "paragraph",
-                  "text": "\"TAX\" (all versions)"
                 }
               ],
               "children": []
@@ -1798,7 +1720,7 @@ window.COJOINZ_DATA = {
                   "blocks": [
                     {
                       "type": "paragraph",
-                      "text": "A major, distinctive feature of the CoJoinz Letterz game is the \"WAGER\" Action Tokenz. These Tokenz create a SPECIAL SESSION called a \"WAGER Session\" that temporarily pauses Grid Play. A WAGER Session is completely unlike standard Grid Play because it creates an interactive gameplay with all Players participating in a \"poker-like\" wagering round to win the \"pot\" of wagered Tokenz (based on the requirements of any of the three variants of \"WAGER\" Action Tokenz in play). Success is achieved through a combination of skillful choices that balance luck (a Player's hand in relation to the specific goal of the \"WAGER\" Action Tokenz) with strategy (mostly through a creative use of wagering that is not directly based on the strength of one's hand). WAGER Session is not a substitute for Grid Play and it is played completely separately from (and before) the Active Player's Grid Play."
+                      "text": "A highly distinctive feature of the CoJoinz Letterz game is the \"WAGER\" Action Tokenz. These Tokenz create a SPECIAL SESSION called a \"WAGER Session\" that temporarily pauses Grid Play. A WAGER Session is completely unlike standard Grid Play because it creates an interactive gameplay with all Players participating in a \"poker-like\" wagering round to win the \"pot\" of wagered Tokenz (based on the requirements of any of the three variants of \"WAGER\" Action Tokenz in play). Success is achieved through a combination of skillful choices that balance luck (the comparative strength of a Player's hand in relation to the specific goal of the \"WAGER\" Action Tokenz) with strategy (mostly through a creative use of wagering that is not directly based on the strength of one's hand). A WAGER Session is not a substitute for Grid Play and it is played before the Active Player's Grid Play."
                     }
                   ],
                   "children": [
@@ -1822,7 +1744,7 @@ window.COJOINZ_DATA = {
                       "children": [
                         {
                           "id": "3.5.2.2.2.1",
-                          "title": "WAGER Sessions begin when a Player reveals their \"WAGER\" Action Tokenz (one of three variants) that each provide a unique goal for which the Players to compete to win.",
+                          "title": "A WAGER Session begins when a Player chooses to play their \"WAGER\" Action Tokenz (one of three variants that each specify a unique goal for which the Players to compete to win) by placing it directly in front of their rack.",
                           "depth": 6,
                           "blocks": [],
                           "children": []
@@ -1858,14 +1780,14 @@ window.COJOINZ_DATA = {
                         },
                         {
                           "id": "3.5.2.2.3.2",
-                          "title": "Players who currently possess 6 or more Tokenz will place their chosen 6 Tokenz face-down in front of them. (Tokenz remain face-down to protect the possessing Player's Tokenz privacy, and the standard \"face value\" of each Tokenz is not relevant in WAGER Sessions as each Tokenz becomes a single unit of WAGER Session \"currency\" with a value of one)",
+                          "title": "Players who hold 6 or more Tokenz at the beginning of the WAGER Session will place their chosen 6 Tokenz face-down in front of them. (The standard \"face value\" and Hand Points of each Tokenz is not relevant in WAGER Sessions as each Tokenz simply becomes a proxy as a single unit of WAGER Session \"currency\" with a value of one)",
                           "depth": 6,
                           "blocks": [],
                           "children": []
                         },
                         {
                           "id": "3.5.2.2.3.3",
-                          "title": "Players who currently possess fewer than 6 Tokenz will automatically receive a minimum of one random T-PAIR from the \"bank\" (two T-PAIRS, if the Player currently possesses 2-3 Tokenz; three T-PAIRS if they possess 0-1 T-PAIRS). The Scorekeeper will record all borrowed T-PAIRS in the Scorz tool as \"T-PAIR Debt\", and each Player will then place their chosen 6 Tokenz face-down in front of them. (Tokenz remain face-down to protect the possessing Player's Tokenz privacy, and the standard \"face value\" of each Tokenz is not relevant in WAGER Sessions as each Tokenz becomes a single unit of WAGER Session \"currency\" with a value of one)",
+                          "title": "Players who hold fewer than 6 Tokenz at the beginning of the WAGER Session will automatically receive a minimum of one random T-PAIR from the \"bank\" (via the Scorekeeper); two T-PAIRS, if the Player currently possesses 2-3 Tokenz; three T-PAIRS if they possess 0-1 T-PAIRS. The Scorekeeper will record all borrowed T-PAIRS in the Scorz tool as \"T-PAIR Debt\", and each Player will then place their chosen 6 Tokenz face-down in front of them.",
                           "depth": 6,
                           "blocks": [],
                           "children": []
@@ -1900,7 +1822,7 @@ window.COJOINZ_DATA = {
                             },
                             {
                               "id": "3.5.2.2.4.2.2",
-                              "title": "Secondly, (if the Player possesses no remaining physical Tokenz) via preset point value deductions for each Tokenz (Action Tokenz = 20 points/each; Bonus Tokenz = 40 points/each); both of these payback values include an average of Hand Points (10 for each Action Tokenz; 20 for each Bonus Tokenz).",
+                              "title": "Secondly, (if the Player holds no remaining physical Tokenz) via preset point value deductions for each Tokenz (Action Tokenz = 20 points/each; Bonus Tokenz = 40 points/each); both of these repayment values include an average of Hand Points (10 for each Action Tokenz; 20 for each Bonus Tokenz).",
                               "depth": 7,
                               "blocks": [],
                               "children": []
@@ -1931,7 +1853,11 @@ window.COJOINZ_DATA = {
                       "blocks": [
                         {
                           "type": "paragraph",
-                          "text": "Wagering is a fun and complex balancing act with luck with strategy. The method called \"Bluffing\" is an especially important wagering strategy as it can often result in a win even if the Player's hand is not the best in the WAGER Session. To simplify, Bluffing involves using your wagers and body language to project confidence, convincing other players your hand is stronger than it actually is, in order to ultimately trick them into folding.  Of course, all such games involve chance (we cannot know how the strength of other Players' hands compare to ours -- and each others' -- nor can we know how effectively other Players can use Bluffing) and risk, but effective Bluffing usually increases the odds of winning.\n\nPlayers who are newer to \"poker-like\" games often underestimate the power of Bluffing and will assume that their wagering should be based solely on how strong their hand is (in relation to the specific goal of the played \"WAGER\" Action Tokenz). This approach relies exclusively on luck (of the Player's hand strength and that of other Players), but it typically results in failure, especially when other Players use strategic Bluffing to intimidate other Players."
+                          "text": "Wagering is a fun and complex balancing act between luck and strategy. The action called \"Bluffing\" is an especially important wagering strategy as it can often result in a win even if the Player's actual hand is not the best in the WAGER Session. Bluffing involves using your wagers and body language to project confidence, convincing other players your hand is strong (potentially stronger than it actually is), in order to ultimately trick them into folding.  Of course, there are risks in that Players cannot know the strength of other Players' hands, nor can anyone know how effectively other Players can use Bluffing, but effective Bluffing usually increases the odds of winning."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "Players who are newer to \"poker-like\" games often underestimate the power of Bluffing and will assume that their wagering should be based solely on how strong their hand is (in relation to the specific goal of the played \"WAGER\" Action Tokenz). This approach relies exclusively on luck (the Player's hand strength versus that of other Players), but it typically results in failure when other Players are using strategic Bluffing."
                         }
                       ],
                       "children": [
@@ -1989,7 +1915,7 @@ window.COJOINZ_DATA = {
                       "blocks": [
                         {
                           "type": "paragraph",
-                          "text": "Once the Wagering round ends, the Player who received the last Call will announce the total point value of their Letter Tiles (according to the played \"WAGER\" Action Tokenz goal) and all remaining Players will then announce theirs, in rotation. In the case of the \"WAGER - BEST WORD\" Action Tokenz, all Players' words must be valid (per the Word Validity rule). Players may not use word lookups during WAGER Sessions."
+                          "text": "Once the Wagering round ends, the Player who received the last Call will announce the total point value of their Letter Tiles (according to the specific goal of the played \"WAGER\" Action Tokenz) and all remaining Players will then announce theirs, in rotation. In the case of the \"WAGER - BEST WORD\" Action Tokenz, all Players' words must be valid (per the Word Validity rule), but Players may not use word lookups during WAGER Sessions."
                         }
                       ],
                       "children": []
@@ -2191,19 +2117,19 @@ window.COJOINZ_DATA = {
             },
             {
               "type": "paragraph",
-              "text": "\"Any\": \"Any\" Wild Letter Tiles substitute for ANY single letter or letter combination (up to 3 letters), and the declared letters will remain valid until they are modified during other Grid Play. They carry a 30-point Hand Points value and 0-point Play Points value."
+              "text": "\"Any\": \"Any\" Wild Letter Tiles substitute for ANY single letter or letter combination (up to 3 letters), and the declared letters will remain valid until they are modified by other Letter Tiles (Wild or not) and/or Action Tokenz during subsequent Grid Play. They carry a 30-point Hand Points value and 0-point Play Points value."
             },
             {
               "type": "paragraph",
-              "text": "\"Conso\": \"Conso\" Wild Letter Tiles substitute for any single CONSONANT letter, and the declared letter will remain valid until it is modified during other Grid Play. They carry a 20-point Hand Points value and 0-point Play Points value."
+              "text": "\"Conso\": \"Conso\" Wild Letter Tiles substitute for any single CONSONANT letter, and the declared letter will remain valid until it is modified by other Letter Tiles (Wild or not) and/or Action Tokenz during subsequent Grid Play. They carry a 20-point Hand Points value and 0-point Play Points value."
             },
             {
               "type": "paragraph",
-              "text": "\"Morph\": \"Morph\" Wild Letter Tiles are the most powerful and versatile Wild Letter Tile. As with \"Any\" Wild Letter Tiles, they substitute for ANY single letter or letter combination (up to 3 letters), but, unlike \"Any\" Wild Letter Tiles, the declared letters will remain valid until they are modified by other subsequent Player who may change their designation to any other single letter or letter combination (up to 3 letters) - they \"Morph\" to fit all Players' Wild Letter Tile needs. They carry a 40-point Hand Points value and 0-point Play Points value."
+              "text": "\"Morph\": \"Morph\" Wild Letter Tiles are the most powerful and versatile Wild Letter Tile. As with \"Any\" Wild Letter Tiles, they substitute for ANY single letter or letter combination (up to 3 letters), but, unlike \"Any\" Wild Letter Tiles, the declared letters will remain valid until they are modified by subsequent Players who may each change their designation to any other single letter or letter combination (up to 3 letters) - the Wild Letter Tile will \"Morph\" to fit all Players' Wild Letter Tile needs. They carry a 40-point Hand Points value and 0-point Play Points value."
             },
             {
               "type": "paragraph",
-              "text": "\"Vowel\": \"Vowel\" Wild Letter Tiles substitute for any single VOWEL letter, and the declared letter will remain valid until it is modified during other Grid Play. They carry a 20-point Hand Points value and 0-point Play Points value."
+              "text": "\"Vowel\": \"Vowel\" Wild Letter Tiles substitute for any single VOWEL letter, and the declared letter will remain valid until it is modified by other Letter Tiles (Wild or not) and/or Action Tokenz during subsequent Grid Play. They carry a 20-point Hand Points value and 0-point Play Points value."
             }
           ],
           "children": []
@@ -2246,7 +2172,7 @@ window.COJOINZ_DATA = {
     },
     {
       "id": "4.0",
-      "title": "Scoring [for all Game Versions except Freeplay]:",
+      "title": "SCORING & EARNING T-PAIRS:",
       "depth": 1,
       "blocks": [],
       "children": [
@@ -2328,7 +2254,7 @@ window.COJOINZ_DATA = {
                 },
                 {
                   "id": "4.3.4.2",
-                  "title": "Leader: Only the Leader will collect additional T-PAIRS that were earned for Grid play (e.g., \"Long-word\"; \"Wild-15\", \"Joinz 3\"; \"Joinz 4\", etc.), subject to the T-PAIR Share rule.",
+                  "title": "Leader: Only the Leader will earn T-PAIRS for the TEAM Turn’s Grid Play (e.g., \"Long-word\"; \"Wild-15\", \"Joinz 3\"; \"Joinz 4\", etc.), subject to the T-PAIR Share rule.",
                   "depth": 4,
                   "blocks": [],
                   "children": []
@@ -2343,7 +2269,7 @@ window.COJOINZ_DATA = {
               "children": [
                 {
                   "id": "4.3.5.1",
-                  "title": "The Threshold: A TEAM Perfect Turn is achieved when a TEAM Turn plays a MINIMUM of 7 total Letter Tiles onto the grid. The Leader is not required to contribute any Letter Tiles from their own hand, and may be satisfied entirely by the other TEAM Partners’ tiles.",
+                  "title": "The Threshold: A TEAM Perfect Turn is achieved when the TEAM plays a MINIMUM of 7 total Letter Tiles onto the Grid. The Leader is not required to contribute any Letter Tiles from their own hand.",
                   "depth": 4,
                   "blocks": [],
                   "children": []
@@ -2409,22 +2335,31 @@ window.COJOINZ_DATA = {
     },
     {
       "id": "5.0",
-      "title": "Winning:",
+      "title": "WINNING:",
       "depth": 1,
       "blocks": [],
       "children": [
         {
           "id": "5.1",
-          "title": "Going Out: Play continues clockwise by default (may be modified by \"REVERSE\" Action Tokenz) until the Letter Tile draw pile is completely empty AND one Player successfully plays the remaining Letter Tiles in their hand.",
+          "title": "Going Out:",
           "depth": 2,
-          "blocks": [],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Play continues clockwise by default (may be modified by \"REVERSE\" Action Tokenz) until the Letter Tile draw pile is completely empty AND one Player successfully plays the remaining Letter Tiles in their hand."
+            }
+          ],
           "children": []
         },
         {
           "id": "5.2",
-          "title": "Game-End Boost: The Player who goes out first earns a 25-Point Game-End boost.",
+          "title": "Game-End Boost:",
           "depth": 2,
           "blocks": [
+            {
+              "type": "paragraph",
+              "text": "The Player who goes out first earns a 25-Point Game-End boost."
+            },
             {
               "type": "paragraph",
               "text": "Alternatively, if playing in either Time-Limited or Round-Limited Modes (but not Deck-Limited Mode), no Game-End boost is earned, and the winner is determined only on the basis of their final total score."
@@ -2434,16 +2369,25 @@ window.COJOINZ_DATA = {
         },
         {
           "id": "5.3",
-          "title": "Hand Points Auditing: Each Letter Tile and Tokenz has its own Hand Point value. Hand Points are the \"cost\" that Players will deduct if they are left in their \"hand\" at the end of the game. For Letter Tiles, the Hand Points are the same as the Play Points displayed at the top of each Letter Tile (except for Wild Letter Tiles that display their Hand Points at the bottom of each Letter Tile, as they have no Play Points value). The Hand Points for each Action Tokenz is 10 points, while the Hand Points for Bonus Tokenz varies greatly according to their relative \"value\" and are displayed at the bottom of each Tokenz [see Table 2].",
+          "title": "Hand Points Auditing:",
           "depth": 2,
-          "blocks": [],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "Each Letter Tile and Tokenz has its own Hand Point value. Hand Points are the \"cost\" that Players will deduct if they are left in their hand at the end of the game. For Letter Tiles, the Hand Points are the same as the Play Points displayed at the top of each Letter Tile (except for Wild Letter Tiles that display their Hand Points at the bottom of each Letter Tile, as they have no Play Points value). The Hand Points for each Action Tokenz is 10 points, while the Hand Points for Bonus Tokenz varies according to their relative \"value\" and are displayed at the bottom of each Tokenz [see 2.1.2]."
+            }
+          ],
           "children": []
         },
         {
           "id": "5.4",
-          "title": "T-PAIR Debt Auditing: For Players whose T-PAIR Debt was not repaid to the \"bank\" during gameplay, the following points will be deducted from their score for each remaining T-PAIR Debt Tokenz:",
+          "title": "T-PAIR Debt Auditing:",
           "depth": 2,
           "blocks": [
+            {
+              "type": "paragraph",
+              "text": "For Players whose T-PAIR Debt was not repaid to the \"bank\" during gameplay, the following points will be deducted from their score for each remaining T-PAIR Debt Tokenz:"
+            },
             {
               "type": "paragraph",
               "text": "Action Tokenz: 20 Points"
@@ -2457,9 +2401,14 @@ window.COJOINZ_DATA = {
         },
         {
           "id": "5.5",
-          "title": "Victory: The Player with the highest final score (after all boosts and auditing) wins.",
+          "title": "Victory:",
           "depth": 2,
-          "blocks": [],
+          "blocks": [
+            {
+              "type": "paragraph",
+              "text": "The Player with the highest final score (after all boosts and auditing) wins."
+            }
+          ],
           "children": []
         }
       ]
@@ -2525,6 +2474,7 @@ window.COJOINZ_DATA = {
     { anchor: "scorekeeper-selection",     title: /^Scorekeeper Selection/i, fallbackId: "1.3.1.3" },
     { anchor: "starting-tpairs",           title: /^Starting Tokenz Qty/i, fallbackId: "1.3.1.4" },
     { anchor: "starting-tokenz",           title: /^Starting Tokenz Qty/i, fallbackId: "1.3.1.4" },
+    { anchor: "baseline-letter-tiles",     title: /^Baseline Letter Tiles Qty/i, fallbackId: "1.3.1.5" },
     { anchor: "assembly",                  title: /^Assembly/i, fallbackId: "1.3.2" },
     { anchor: "opening-draw",              title: /^Opening Draw/i, fallbackId: "1.4" },
     { anchor: "opening-draw-letter-tiles", title: /^Letter Tiles:\s*starting/i, fallbackId: "1.4.1" },
@@ -2537,16 +2487,16 @@ window.COJOINZ_DATA = {
     { anchor: "tokenz-types",              title: /^Tokenz Types/i, fallbackId: "2.1" },
     { anchor: "action-tokenz-list",        title: /^Action:/i, fallbackId: "2.1.1" },
     { anchor: "bonus-tokenz-list",         title: /^Bonus:/i, fallbackId: "2.1.2" },
-    { anchor: "tokenz-earning",            title: /^Tokenz Earning/i, fallbackId: "2.2" },
+    { anchor: "tokenz-earning",            title: /^(Tokenz Earning|Earning Tokenz)/i, fallbackId: "2.2" },
     { anchor: "t-pairs",                   title: /T-PAIR\W{0,3}\s*Process/i, fallbackId: "2.2.1" },
     { anchor: "t-pair-process",            title: /T-PAIR\W{0,3}\s*Process/i, fallbackId: "2.2.1" },
     { anchor: "t-pair-draw",               title: /^When a Player earns one or more T-PAIRs/i, fallbackId: "2.2.1.1" },
     { anchor: "t-pair-share",              title: /^T-PAIR Share Rule/i, fallbackId: "2.2.1.1.1" },
-    { anchor: "t-pair-share-exemptions",   title: /^T-PAIR Share Exemptions/i, fallbackId: "2.2.1.1.1.1" },
+    { anchor: "t-pair-share-exemptions",   title: /^(T-PAIR Share Exemptions|Exemptions to the T-PAIR Share)/i, fallbackId: "2.2.1.1.1.1" },
     { anchor: "exemption-valid-word",      title: /^VALID WORD:/i, fallbackId: "2.2.1.1.1.1.1" },
     { anchor: "exemption-invalid-word",    title: /^INVALID WORD:/i, fallbackId: "2.2.1.1.1.1.2" },
     { anchor: "exemption-wager-payoff",    title: /^WAGER Session payoff/i, fallbackId: "2.2.1.1.1.1.3" },
-    { anchor: "exemption-bonus-tokenz",    title: /^\W*Bonus\W+Tokenz:\s*Any Player/i, fallbackId: "2.2.1.1.1.1.4" },
+    { anchor: "exemption-bonus-tokenz",    title: /^(\W*Bonus\W+Tokenz|Certain Bonus Tokenz):\s*Any Player/i, fallbackId: "2.2.1.1.1.1.4" },
     { anchor: "tokenz-expiration",         title: /^Tokenz Play\s*&\s*Expiration/i, fallbackId: "2.3" },
     { anchor: "anytime-expiration",        title: /^\W*Anytime\W+Action Tokenz may only/i, fallbackId: "2.3.1" },
     { anchor: "bonus-discard",             title: /^All used Bonus Tokenz/i, fallbackId: "2.3.2" },
@@ -2575,13 +2525,13 @@ window.COJOINZ_DATA = {
     { anchor: "wager",                     title: /^\W*WAGER\W+Action Tokenz\s*&\s*WAGER Sessions/i, fallbackId: "3.5.2.2" },
     { anchor: "wager-currency",            title: /^Tokenz As Currency/i, fallbackId: "3.5.2.2.1" },
     { anchor: "wager-activation",          title: /^WAGER Session Activation/i, fallbackId: "3.5.2.2.2" },
-    { anchor: "wager-activation-start",    title: /^WAGER Sessions begin when/i, fallbackId: "3.5.2.2.2.1" },
+    { anchor: "wager-activation-start",    title: /^(A )?WAGER Sessions? begins? when/i, fallbackId: "3.5.2.2.2.1" },
     { anchor: "wager-activation-scorz",    title: /^The Scorekeeper then announces/i, fallbackId: "3.5.2.2.2.2" },
     { anchor: "wager-activation-pools",    title: /^Each Player will set up their individual/i, fallbackId: "3.5.2.2.2.3" },
     { anchor: "wager-pools",               title: /^\W*Wager Pools\W*$/i, fallbackId: "3.5.2.2.3" },
     { anchor: "wager-pool-size",           title: /^Each Player will wager only/i, fallbackId: "3.5.2.2.3.1" },
-    { anchor: "wager-pool-six-plus",       title: /^Players who currently possess 6 or more/i, fallbackId: "3.5.2.2.3.2" },
-    { anchor: "wager-pool-under-six",      title: /^Players who currently possess fewer than 6/i, fallbackId: "3.5.2.2.3.3" },
+    { anchor: "wager-pool-six-plus",       title: /^Players who (currently possess|hold) 6 or more/i, fallbackId: "3.5.2.2.3.2" },
+    { anchor: "wager-pool-under-six",      title: /^Players who (currently possess|hold) fewer than 6/i, fallbackId: "3.5.2.2.3.3" },
     { anchor: "t-pair-debt",               title: /^\W*T-PAIR Debt\W*$/i, fallbackId: "3.5.2.2.4" },
     { anchor: "t-pair-debt-logging",       title: /^All T-PAIR Debt will be/i, fallbackId: "3.5.2.2.4.1" },
     { anchor: "t-pair-debt-repayment",     title: /^At the end of the game, any unpaid/i, fallbackId: "3.5.2.2.4.2" },
@@ -2650,6 +2600,9 @@ window.COJOINZ_DATA = {
   let DATA = null;
   let FLAT_INDEX = []; // flattened list of {id, title, path, blockTexts, node}
   let EDIT_MODE = false;
+  // "see 3.2.1" / "see Rule 3.2.1" cross-references (see renderRichText).
+  const XREF_RE = /\bsee\s+(?:Rule\s+|Section\s+)?(\d+(?:\.\d+)+)/gi;
+  const SIDEBAR_W_KEY = "cojoinz-infoz-sidebar-w"; // remembered pane width
 
   const el = {
     docHeader: document.getElementById("docHeader"),
@@ -2687,6 +2640,8 @@ window.COJOINZ_DATA = {
     resolveNamedAnchors();
     renderTOC();
     renderSections();
+    wireSectionInteractions();
+    wirePaneDivider();
     wireSearch();
     wireSidebarToggle();
     wireEditModal();
@@ -2871,20 +2826,29 @@ window.COJOINZ_DATA = {
 
     const title = document.createElement("span");
     title.className = "section-title";
-    title.textContent = node.title;
+    renderRichText(title, node.title, { splitLabel: true });
     head.appendChild(title);
     makeEditable(title, (val) => {
       node.title = val;
       syncTocTitle(node.id, val);
       buildFlatIndex();
+      renderRichText(title, val, { splitLabel: true });
     }, { singleLine: true, stopRowClick: true });
 
     const hasChildren = node.children && node.children.length > 0;
+    const hasBlocks = (node.blocks || []).length > 0;
+    const hasTable = (node.blocks || []).some((b) => b.type === "table");
+    // Anything with content below its heading can be expanded/collapsed.
+    const collapsible = hasChildren || hasBlocks;
+    // Parents start closed (except the first chapter). Leaf sections start
+    // open, except big data tables (e.g. the Tokenz lists), which start
+    // closed so they don't swamp the page.
+    const startOpen = hasChildren ? defaultOpen : !hasTable;
 
     let caret = null;
-    if (hasChildren) {
+    if (collapsible) {
       caret = document.createElement("span");
-      caret.className = "section-caret" + (defaultOpen ? " open" : "");
+      caret.className = "section-caret" + (startOpen ? " open" : "");
       caret.textContent = "▶";
       head.appendChild(caret);
     }
@@ -2892,10 +2856,7 @@ window.COJOINZ_DATA = {
     card.appendChild(head);
 
     const body = document.createElement("div");
-    // Leaf nodes (no children) have no toggle to open them, so their
-    // content must always be visible rather than defaulting to closed.
-    const forceOpen = defaultOpen || !hasChildren;
-    body.className = "section-body" + (forceOpen ? " open" : "");
+    body.className = "section-body" + (startOpen || !collapsible ? " open" : "");
 
     (node.blocks || []).forEach((b) => body.appendChild(buildBlock(b)));
 
@@ -2908,21 +2869,99 @@ window.COJOINZ_DATA = {
 
     card.appendChild(body);
 
-    if (hasChildren) {
-      head.addEventListener("click", (e) => {
-        if (EDIT_MODE && e.target.closest('[data-editable="1"]')) return;
-        const isOpen = body.classList.toggle("open");
-        caret.classList.toggle("open", isOpen);
-        if (isOpen) setActiveTocRow(node.id);
-      });
-    } else {
-      head.addEventListener("click", (e) => {
-        if (EDIT_MODE && e.target.closest('[data-editable="1"]')) return;
-        setActiveTocRow(node.id);
-      });
-    }
+    head.addEventListener("click", (e) => {
+      if (EDIT_MODE && e.target.closest('[data-editable="1"]')) return;
+      if (collapsible) toggleCard(card);
+      setActiveSection(node.id);
+    });
 
     return card;
+  }
+
+  // Expand or collapse one section card (its own body only).
+  function toggleCard(card, forceOpen) {
+    const body = card.querySelector(":scope > .section-body");
+    const caret = card.querySelector(":scope > .section-head > .section-caret");
+    if (!body || !caret) return; // nothing to collapse
+    const isOpen = body.classList.toggle("open", forceOpen);
+    caret.classList.toggle("open", isOpen);
+  }
+
+  // Marks a section as the current one in both panes: the left-pane TOC
+  // row and the right-pane card (light green background).
+  function setActiveSection(id) {
+    setActiveTocRow(id);
+    document.querySelectorAll(".section-card.is-active").forEach((c) => c.classList.remove("is-active"));
+    const card = findSectionCard(id);
+    if (card) card.classList.add("is-active");
+  }
+
+  /* ---------------- Rich text (bold labels + cross-reference links) ----------------
+     Renders plain text into `elm` without changing its textContent, except
+     that **double-starred** words lose their stars and show in bold:
+       - splitLabel: a title written as "Label: explanation…" shows the
+         label in bold and the explanation as normal body text.
+       - "see 3.2.1" / "see Rule 3.2.1" / "see Section 3.2.1" becomes a green
+         link to that section (only when that section exists). */
+  function renderRichText(elm, text, opts) {
+    opts = opts || {};
+    text = String(text || "");
+    elm.textContent = "";
+    let label = "";
+    let rest = text;
+    if (opts.splitLabel) {
+      const m = /^([^:]{1,90}:)(\s+)(\S[\s\S]*)$/.exec(text);
+      if (m) {
+        label = m[1] + m[2];
+        rest = m[3];
+      }
+    }
+    if (label) {
+      appendInline(elm, label);
+      const span = document.createElement("span");
+      span.className = "title-rest";
+      appendInline(span, rest);
+      elm.appendChild(span);
+    } else {
+      appendInline(elm, rest);
+    }
+    elm._renderedText = elm.textContent;
+  }
+
+  // Appends text, turning **bold** runs into <strong> and xrefs into links.
+  function appendInline(parent, text) {
+    const parts = text.split(/\*\*([^*]+)\*\*/);
+    parts.forEach((part, i) => {
+      if (!part) return;
+      if (i % 2 === 1) {
+        const strong = document.createElement("strong");
+        strong.className = "rich-strong";
+        appendXrefs(strong, part);
+        parent.appendChild(strong);
+      } else {
+        appendXrefs(parent, part);
+      }
+    });
+  }
+
+  function appendXrefs(parent, text) {
+    let last = 0;
+    let m;
+    XREF_RE.lastIndex = 0;
+    while ((m = XREF_RE.exec(text))) {
+      const id = m[1];
+      if (!FLAT_INDEX.some((e) => e.id === id)) continue;
+      if (m.index > last) parent.appendChild(document.createTextNode(text.slice(last, m.index)));
+      const a = document.createElement("a");
+      a.className = "xref";
+      a.dataset.target = id;
+      const named = (SECTION_TO_ANCHORS[id] || [])[0];
+      a.href = "#" + (named || id);
+      a.textContent = m[0];
+      parent.appendChild(a);
+      last = m.index + m[0].length;
+    }
+    if (last < text.length) parent.appendChild(document.createTextNode(text.slice(last)));
   }
 
   // Reading-priority heuristic for token/reference tables: the first column
@@ -2933,7 +2972,12 @@ window.COJOINZ_DATA = {
   function columnClassFor(header, index) {
     if (index === 0) return "col-name";
     const h = String(header || "").trim();
-    if (/^(TYPE|COUNT|QTY|PLAY PTS|HAND PTS)/i.test(h)) return "col-narrow";
+    if (/\b(TYPE|COUNT|QTY|POINTS|PTS)\b/i.test(h)) {
+      // Play Points show in bold, Hand Points in italics.
+      if (/\bPLAY\b/i.test(h)) return "col-narrow col-strong";
+      if (/\bHAND\b/i.test(h)) return "col-narrow col-em";
+      return "col-narrow";
+    }
     return "col-wide";
   }
 
@@ -2956,7 +3000,7 @@ window.COJOINZ_DATA = {
         b.headers.forEach((h, i) => {
           const th = document.createElement("th");
           th.textContent = h;
-          if (colClasses[i]) th.classList.add(colClasses[i]);
+          if (colClasses[i]) th.className = colClasses[i];
           tr.appendChild(th);
         });
         thead.appendChild(tr);
@@ -2968,7 +3012,7 @@ window.COJOINZ_DATA = {
         r.forEach((c, i) => {
           const td = document.createElement("td");
           td.textContent = c;
-          if (colClasses[i]) td.classList.add(colClasses[i]);
+          if (colClasses[i]) td.className = colClasses[i];
           tr.appendChild(td);
         });
         tbody.appendChild(tr);
@@ -2979,12 +3023,129 @@ window.COJOINZ_DATA = {
     }
     const p = document.createElement("p");
     p.className = "block-paragraph";
-    p.textContent = b.text || "";
+    renderRichText(p, b.text || "");
     makeEditable(p, (val) => {
       b.text = val;
       buildFlatIndex();
+      renderRichText(p, val);
     }, { singleLine: false });
     return p;
+  }
+
+  /* ---------------- Cross-reference links + double-click toggling ---------------- */
+
+  function wireSectionInteractions() {
+    // Capture phase, so a link inside a section heading doesn't also
+    // expand/collapse that section.
+    el.sections.addEventListener("click", (e) => {
+      const link = e.target.closest("a.xref");
+      if (!link) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (EDIT_MODE) return;
+      goToSection(link.dataset.target, true);
+    }, true);
+
+    // Double-click anywhere on a section's box (heading, text, or the gap
+    // around it) expands/collapses it. Single clicks on a heading already
+    // toggle it twice (net zero) before the dblclick fires, so the result is
+    // always exactly one toggle.
+    el.sections.addEventListener("dblclick", (e) => {
+      if (EDIT_MODE || e.target.closest("a.xref")) return;
+      let card = e.target.closest(".section-card");
+      // In the gap between child boxes: use the nearest child box.
+      if (e.target.classList && e.target.classList.contains("children-wrap")) {
+        card = nearestChildCard(e.target, e.clientY) || card;
+      }
+      if (!card) return;
+      toggleCard(card);
+      setActiveSection(card.dataset.sectionId);
+      const sel = window.getSelection && window.getSelection();
+      if (sel && sel.removeAllRanges) sel.removeAllRanges();
+    });
+  }
+
+  function nearestChildCard(wrap, y) {
+    let best = null;
+    let bestDist = Infinity;
+    Array.from(wrap.children).forEach((c) => {
+      if (!c.classList.contains("section-card")) return;
+      const r = c.getBoundingClientRect();
+      const dist = y < r.top ? r.top - y : y > r.bottom ? y - r.bottom : 0;
+      if (dist < bestDist) { bestDist = dist; best = c; }
+    });
+    return best;
+  }
+
+  /* ---------------- Resizable pane divider (desktop) ---------------- */
+
+  function wirePaneDivider() {
+    const divider = document.createElement("div");
+    divider.className = "pane-divider";
+    divider.setAttribute("role", "separator");
+    divider.setAttribute("aria-orientation", "vertical");
+    divider.setAttribute("aria-label", "Resize sections");
+    el.sidebar.insertAdjacentElement("afterend", divider);
+
+    const tip = document.createElement("div");
+    tip.className = "pane-divider-tip";
+    tip.textContent = "Click and drag the blue bar to resize sections";
+    tip.hidden = true;
+    document.body.appendChild(tip);
+
+    const root = document.documentElement;
+    const clamp = (w) => Math.max(180, Math.min(w, window.innerWidth - 360));
+    const setWidth = (w) => root.style.setProperty("--sidebar-drag-w", clamp(w) + "px");
+
+    try {
+      const saved = parseInt(localStorage.getItem(SIDEBAR_W_KEY), 10);
+      if (saved) setWidth(saved);
+    } catch (e) { /* storage unavailable: keep the default width */ }
+
+    let dragging = false;
+    const placeTip = (y) => {
+      const r = divider.getBoundingClientRect();
+      tip.style.left = (r.right + 10) + "px";
+      tip.style.top = Math.max(r.top + 6, Math.min(y - 20, window.innerHeight - 60)) + "px";
+    };
+
+    divider.addEventListener("pointerenter", (e) => {
+      if (dragging) return;
+      placeTip(e.clientY);
+      tip.hidden = false;
+    });
+    divider.addEventListener("pointermove", (e) => {
+      if (!dragging && !tip.hidden) placeTip(e.clientY);
+    });
+    divider.addEventListener("pointerleave", () => {
+      tip.hidden = true;
+    });
+
+    divider.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+      dragging = true;
+      tip.hidden = true;
+      divider.classList.add("dragging");
+      document.body.classList.add("pane-resizing");
+      divider.setPointerCapture(e.pointerId);
+    });
+    divider.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      setWidth(e.clientX - el.sidebar.getBoundingClientRect().left);
+    });
+    const endDrag = (e) => {
+      if (!dragging) return;
+      dragging = false;
+      divider.classList.remove("dragging");
+      document.body.classList.remove("pane-resizing");
+      try { divider.releasePointerCapture(e.pointerId); } catch (err) { /* already released */ }
+      try {
+        localStorage.setItem(SIDEBAR_W_KEY, String(Math.round(el.sidebar.getBoundingClientRect().width)));
+      } catch (err) { /* storage unavailable: width just won't be remembered */ }
+    };
+    divider.addEventListener("pointerup", endDrag);
+    divider.addEventListener("pointercancel", endDrag);
   }
 
   /* ---------------- Inline edit mode ---------------- */
@@ -3016,8 +3177,11 @@ window.COJOINZ_DATA = {
   function onEditableBlur(e) {
     if (!EDIT_MODE) return;
     const elm = e.currentTarget;
+    const val = elm.textContent.trim();
+    // Rich text hides **bold** markers, so only commit real changes.
+    if (elm._renderedText !== undefined && val === elm._renderedText.trim()) return;
     if (typeof elm._editCommit === "function") {
-      elm._editCommit(elm.textContent.trim());
+      elm._editCommit(val);
     }
   }
 
@@ -3059,7 +3223,7 @@ window.COJOINZ_DATA = {
       }
     });
 
-    setActiveTocRow(id);
+    setActiveSection(id);
 
     clearSearchHighlight();
     let matchEl = null;
