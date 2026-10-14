@@ -119,11 +119,58 @@ button { font-family: inherit; }
 .search-input:focus { border-color: var(--primary); }
 .search-input::placeholder { color: var(--text-muted); }
 
-.search-results {
+/* Gear button + drop-down column (Advanced panel above the results). */
+.search-input { padding-right: 42px; }
+.search-gear {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 17px;
+  cursor: pointer;
+}
+.search-gear:hover, .search-gear.on { color: var(--text-color); background-color: rgba(59,130,246,0.18); }
+.search-drop {
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
   right: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.search-adv {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+  font-size: 13px;
+}
+.search-adv[hidden] { display: none; }
+.adv-opts { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 10px; }
+.adv-opts label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.adv-add { display: flex; gap: 6px; margin-bottom: 10px; }
+.adv-add select, .adv-add .adv-term {
+  background-color: rgba(15,23,42,0.6);
+  border: 1px solid var(--border);
+  color: var(--text-color);
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 13px;
+}
+.adv-add .adv-term { flex: 1; min-width: 0; }
+.adv-add .btn { padding: 6px 12px; }
+.adv-help { color: var(--text-muted); line-height: 1.6; }
+.adv-help b { color: var(--text-color); }
+.search-results {
   background-color: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -173,6 +220,41 @@ mark.search-hit-highlight {
   padding: 0 2px;
   box-shadow: 0 0 0 2px rgba(251,191,36,0.35);
 }
+mark.search-hit-highlight.is-current { background-color: #fb923c; box-shadow: 0 0 0 3px #fb923c; }
+table.block-table tr.row-hit td { background-color: rgba(251,191,36,0.14); }
+table.block-table tr.row-hit td:first-child { box-shadow: inset 4px 0 0 var(--gold); }
+
+/* "2 of 5" match stepper after a search jump */
+.hit-nav {
+  position: fixed;
+  right: 18px;
+  bottom: 70px; /* just above the Back button */
+  z-index: 65;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+  background-color: var(--gold);
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+}
+.hit-nav[hidden] { display: none; }
+.hit-nav button {
+  border: none;
+  background: transparent;
+  color: #1a1a1a;
+  font-size: 14px;
+  font-weight: 700;
+  width: 34px;
+  height: 30px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.hit-nav button:hover { background-color: rgba(0,0,0,0.12); }
+.hit-count { padding: 0 6px; white-space: nowrap; }
 
 /* ---------- Layout ---------- */
 .layout { flex: 1; display: flex; min-height: 0; }
@@ -598,7 +680,24 @@ body.pane-resizing, body.pane-resizing * { cursor: ew-resize !important; user-se
   .content { padding: 16px 12px 80px; }
 }
 
+@media (max-width: 600px) {
+  /* The collapsed box is too narrow for the gear: show it once expanded. */
+  .search-wrap:not(:focus-within):not(.adv-open) .search-gear { display: none; }
+  .search-wrap:not(:focus-within):not(.adv-open) .search-input { padding-right: 10px; }
+  .search-wrap:focus-within, .search-wrap.adv-open {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    top: 11px;
+    margin: 0;
+    max-width: none;
+    z-index: 45;
+  }
+  .search-wrap:focus-within .search-input, .search-wrap.adv-open .search-input { background-color: var(--card-bg); font-size: 16px; }
+}
+
 @media (max-width: 480px) {
+  .hit-nav { right: 16px; bottom: 68px; }
   .search-input { font-size: 13px; }
   .brand-mark { font-size: 14px; }
   :root { --sidebar-w: 84vw; }
@@ -2744,6 +2843,15 @@ window.COJOINZ_DATA = {
   const SIDEBAR_W_KEY = "cojoinz-infoz-sidebar-w"; // remembered pane width
   let backDismissed = false; // floating Back button hidden via its ✕
   let backEl = null;
+  let SEARCH_INDEX = []; // sections + table rows (see buildSearchIndex)
+  const SEARCH_OPTS_KEY = "cojoinz-infoz-search-opts";
+  const searchOpts = { matchCase: false, wholeWord: false };
+  let activeIndex = -1;      // keyboard-selected search result
+  let currentResults = [];
+  let searchAdvEl = null;    // Advanced search panel
+  let hitMarks = [];         // on-page highlights from the last search jump
+  let hitIndex = 0;
+  let hitNavEl = null;       // "2 of 5" stepper
 
   const el = {
     docHeader: document.getElementById("docHeader"),
@@ -2841,6 +2949,7 @@ window.COJOINZ_DATA = {
       });
       (node.children || []).forEach((c) => walk(c, path));
     }
+    buildSearchIndex();
   }
 
   function tableToText(b) {
@@ -3391,7 +3500,7 @@ window.COJOINZ_DATA = {
     clearSearchHighlight();
     let matchEl = null;
     if (query && query.trim()) {
-      matchEl = highlightMatchInCard(target, query.trim());
+      matchEl = highlightHits(target, query.trim(), opts);
     }
 
     if (opts.arrival) {
@@ -3436,7 +3545,7 @@ window.COJOINZ_DATA = {
      button — returns to that exact spot. Jumps chain: each Back steps back
      one jump. */
 
-  function navigateTo(id, query, fromId) {
+  function navigateTo(id, query, fromId, goOpts) {
     if (!findSectionCard(id)) return;
     const cur = history.state && history.state.infoz ? history.state : { infoz: true, depth: 0 };
     const pos = capturePosition();
@@ -3446,13 +3555,13 @@ window.COJOINZ_DATA = {
     const named = (SECTION_TO_ANCHORS[id] || [])[0];
     if (cur.target === id) {
       // Same destination again: don't stack duplicate Back steps.
-      goToSection(id, false, query);
+      goToSection(id, false, query, goOpts);
       return;
     }
     history.pushState({ infoz: true, depth: (cur.depth || 0) + 1, target: id, backLabel: from ? sectionLabel(from) : (pos.y < 300 ? "top" : "") },
       "", "#" + (named || id));
     backDismissed = false;
-    goToSection(id, false, query);
+    goToSection(id, false, query, goOpts);
     updateBackButton();
   }
 
@@ -3621,58 +3730,318 @@ window.COJOINZ_DATA = {
     }
   }
 
-  /* ---------------- On-page search-match highlight ---------------- */
+  /* ---------------- Search ----------------
+     Query syntax (plain search syntax, not RegEx):
+       words           all must appear (AND is the default)
+       "exact phrase"  straight or curly quotes
+       OR, AND, NOT    upper-case operators; -word is short for NOT word
+       ( )             grouping
+       * / ?           any letters / exactly one letter, within a word
+     Words match from the start of a word ("tile" finds "tiles", "new" does
+     not find "renewed"). The Advanced panel adds Whole Word / Match Case.
+     Every section and every table row is its own search result. */
 
-  // Wraps the first occurrence of any search term found in a section
-  // card's own text (title + blocks, not its nested children) in a
-  // <mark class="search-hit-highlight">, so a player who jumped here from
-  // search doesn't have to hunt for the matched text themselves.
-  function highlightMatchInCard(cardEl, query) {
-    const terms = query.split(/\s+/).filter(Boolean).sort((a, b) => b.length - a.length);
-    if (!terms.length) return null;
-    const head = cardEl.querySelector(":scope > .section-head");
-    const body = cardEl.querySelector(":scope > .section-body");
-    const scopes = [head, body].filter(Boolean);
+  function buildSearchIndex() {
+    SEARCH_INDEX = [];
+    FLAT_INDEX.forEach((entry) => {
+      SEARCH_INDEX.push({ kind: "section", id: entry.id, title: String(entry.title || ""), text: entry.paragraphText || "", path: entry.path });
+      (entry.node.blocks || []).forEach((b, bi) => {
+        if (b.type !== "table") return;
+        (b.rows || []).forEach((r, ri) => {
+          const cells = r.slice(1).map((c) => String(c || ""));
+          SEARCH_INDEX.push({
+            kind: "row", id: entry.id, title: String(r[0] || ""), text: cells.join("  ·  "),
+            // preview leaves out bare numbers (counts / points)
+            preview: cells.filter((c) => /\p{L}{2}/u.test(c)).join("  ·  "),
+            path: entry.path, blockIndex: bi, rowIndex: ri,
+          });
+        });
+      });
+    });
+  }
 
-    for (const scope of scopes) {
+  const QUOTE_RE = /["“”„]/;
+
+  function tokenizeQuery(q) {
+    const toks = [];
+    let i = 0;
+    while (i < q.length) {
+      const ch = q[i];
+      if (/\s/.test(ch)) { i++; continue; }
+      if (ch === "(" || ch === ")") { toks.push({ t: ch }); i++; continue; }
+      if (QUOTE_RE.test(ch)) {
+        let j = i + 1;
+        while (j < q.length && !QUOTE_RE.test(q[j])) j++;
+        const phrase = q.slice(i + 1, j).trim();
+        if (phrase) toks.push({ t: "term", v: phrase, phrase: true });
+        i = j + 1;
+        continue;
+      }
+      let j = i;
+      while (j < q.length && !/[\s()]/.test(q[j]) && !QUOTE_RE.test(q[j])) j++;
+      let word = q.slice(i, j);
+      i = j;
+      if (word === "AND" || word === "OR" || word === "NOT") { toks.push({ t: word }); continue; }
+      if (word[0] === "-") {
+        toks.push({ t: "NOT" });
+        word = word.slice(1);
+        if (!word) continue;
+      }
+      toks.push({ t: "term", v: word, phrase: false });
+    }
+    return toks;
+  }
+
+  // Grammar: or := and (OR and)* ; and := not (AND? not)* ;
+  //          not := NOT not | ( or ) | term.  Returns null for an empty query.
+  function parseQuery(toks) {
+    let pos = 0;
+    const peek = () => toks[pos];
+    function parseOr() {
+      const parts = [parseAnd()];
+      while (peek() && peek().t === "OR") { pos++; parts.push(parseAnd()); }
+      const kept = parts.filter(Boolean);
+      return kept.length > 1 ? { op: "or", parts: kept } : kept[0] || null;
+    }
+    function parseAnd() {
+      const parts = [];
+      while (peek() && peek().t !== "OR" && peek().t !== ")") {
+        if (peek().t === "AND") { pos++; continue; }
+        const n = parseNot();
+        if (n) parts.push(n);
+      }
+      return parts.length > 1 ? { op: "and", parts } : parts[0] || null;
+    }
+    function parseNot() {
+      const tk = toks[pos++];
+      if (tk.t === "NOT") {
+        if (!peek()) return null;
+        const n = parseNot();
+        return n ? { op: "not", part: n } : null;
+      }
+      if (tk.t === "(") {
+        const n = parseOr();
+        if (peek() && peek().t === ")") pos++;
+        return n;
+      }
+      if (tk.t === "term") return { op: "term", term: tk };
+      return null;
+    }
+    const parts = [];
+    while (pos < toks.length) {
+      if (peek().t === ")") { pos++; continue; }
+      const n = parseOr();
+      if (n) parts.push(n);
+    }
+    return parts.length > 1 ? { op: "and", parts } : parts[0] || null;
+  }
+
+  const WORD_CH = "\\p{L}\\p{N}";
+
+  function termRegex(text, opts, wholeWord) {
+    const body = text.split(/\s+/).filter(Boolean).map((w) =>
+      Array.from(w).map((c) => (c === "*" ? `[${WORD_CH}'’-]*` : c === "?" ? `[${WORD_CH}]` : escapeRegExp(c))).join("")
+    ).join("\\s+");
+    // Group 1 = the character before the match (word start), group 2 = match.
+    return new RegExp(`(^|[^${WORD_CH}])(${body})` + (wholeWord ? `(?![${WORD_CH}])` : ""), opts.matchCase ? "gu" : "giu");
+  }
+
+  function compileQuery(q, opts) {
+    let ast = null;
+    try {
+      ast = parseQuery(tokenizeQuery(String(q || "")));
+    } catch (e) {
+      return null;
+    }
+    if (!ast) return null;
+    const positives = [];
+    (function collect(n, neg) {
+      if (n.op === "term") {
+        n.re = termRegex(n.term.v, opts, opts.wholeWord);
+        n.reWhole = opts.wholeWord ? n.re : termRegex(n.term.v, opts, true);
+        if (!neg) positives.push(n);
+      } else if (n.op === "not") {
+        collect(n.part, !neg);
+      } else {
+        n.parts.forEach((p) => collect(p, neg));
+      }
+    })(ast, false);
+    return { ast, positives, opts };
+  }
+
+  function reTest(re, s) {
+    re.lastIndex = 0;
+    return re.test(s);
+  }
+
+  function evalQuery(n, hay) {
+    if (n.op === "term") return reTest(n.re, hay);
+    if (n.op === "not") return !evalQuery(n.part, hay);
+    if (n.op === "and") return n.parts.every((p) => evalQuery(p, hay));
+    return n.parts.some((p) => evalQuery(p, hay));
+  }
+
+  // [start, end] ranges of every positive-term match in `text`, merged.
+  function matchRanges(text, cq) {
+    const ranges = [];
+    cq.positives.forEach((n) => {
+      const re = n.re;
+      re.lastIndex = 0;
+      let m;
+      while ((m = re.exec(text))) {
+        const start = m.index + m[1].length;
+        if (m[2].length) ranges.push([start, start + m[2].length]);
+        if (re.lastIndex === m.index) re.lastIndex++;
+      }
+    });
+    ranges.sort((a, b) => a[0] - b[0]);
+    const merged = [];
+    ranges.forEach((r) => {
+      const last = merged[merged.length - 1];
+      if (last && r[0] <= last[1]) last[1] = Math.max(last[1], r[1]);
+      else merged.push(r.slice());
+    });
+    return merged;
+  }
+
+  function search(query, limit) {
+    const cq = compileQuery(query, searchOpts);
+    if (!cq) return [];
+    const idQuery = /^\d+(\.\d+)*\.?$/.test(query.trim()) ? query.trim().replace(/\.$/, "") : null;
+    const results = [];
+    SEARCH_INDEX.forEach((entry, order) => {
+      const hay = entry.title + "\n" + entry.text;
+      let score = 0;
+      if (idQuery && entry.kind === "section" && (entry.id === idQuery || entry.id.startsWith(idQuery + "."))) {
+        score = entry.id === idQuery ? 100 : 60 - entry.id.length;
+      } else if (evalQuery(cq.ast, hay)) {
+        score = 1;
+        cq.positives.forEach((n) => {
+          const bonus = n.term.phrase ? 3 : 0;
+          n.re.lastIndex = 0;
+          const t = n.re.exec(entry.title);
+          if (t) score += (t.index === 0 ? 10 : 6) + bonus;
+          if (reTest(n.re, entry.text)) score += 2 + bonus;
+          if (reTest(n.reWhole, hay)) score += 2;
+        });
+        if (entry.kind === "row" && cq.positives.some((n) => reTest(n.re, entry.title))) score += 4;
+      }
+      if (score > 0) results.push({ entry, score, order });
+    });
+    results.sort((a, b) => b.score - a.score || a.order - b.order);
+    return results.slice(0, limit).map((r) => r.entry);
+  }
+
+  function highlightHTML(text, cq) {
+    const ranges = cq ? matchRanges(text, cq) : [];
+    let out = "";
+    let last = 0;
+    ranges.forEach(([s, e]) => {
+      out += escapeHTML(text.slice(last, s)) + "<mark>" + escapeHTML(text.slice(s, e)) + "</mark>";
+      last = e;
+    });
+    return out + escapeHTML(text.slice(last));
+  }
+
+  function snippetAround(text, cq) {
+    const ranges = cq ? matchRanges(text, cq) : [];
+    const idx = ranges.length ? ranges[0][0] : 0;
+    const start = Math.max(0, idx - 40);
+    const end = Math.min(text.length, idx + 110);
+    return (start > 0 ? "…" : "") + text.slice(start, end) + (end < text.length ? "…" : "");
+  }
+
+  /* ---------------- On-page highlight of every match ---------------- */
+
+  // Marks every match in the section's own text (heading, paragraphs and
+  // tables; not nested child sections). For a table-row result, starts at
+  // the first match in that row. Returns the element to scroll to.
+  function highlightHits(card, query, opts) {
+    const cq = compileQuery(query, searchOpts);
+    if (!cq || !cq.positives.length) return null;
+    const scopes = [card.querySelector(":scope > .section-head"), card.querySelector(":scope > .section-body")].filter(Boolean);
+    const textNodes = [];
+    scopes.forEach((scope) => {
       const walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT, {
         acceptNode: (node) => {
-          if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
           const p = node.parentElement;
-          if (p && p.tagName === "MARK") return NodeFilter.FILTER_REJECT;
-          if (p && isWithinChildrenWrap(p, scope)) return NodeFilter.FILTER_REJECT; // skip nested child sections
+          if (!node.nodeValue || !node.nodeValue.trim()) return NodeFilter.FILTER_REJECT;
+          if (p && (p.tagName === "MARK" || p.closest(".section-badge"))) return NodeFilter.FILTER_REJECT;
+          if (p && isWithinChildrenWrap(p, scope)) return NodeFilter.FILTER_REJECT;
           return NodeFilter.FILTER_ACCEPT;
         },
       });
-      let textNode;
-      while ((textNode = walker.nextNode())) {
-        const hay = textNode.nodeValue.toLowerCase();
-        let bestIdx = -1;
-        let bestLen = 0;
-        for (const t of terms) {
-          const idx = hay.indexOf(t.toLowerCase());
-          if (idx !== -1) {
-            bestIdx = idx;
-            bestLen = t.length;
-            break;
-          }
-        }
-        if (bestIdx !== -1) {
-          try {
-            const range = document.createRange();
-            range.setStart(textNode, bestIdx);
-            range.setEnd(textNode, bestIdx + bestLen);
-            const mark = document.createElement("mark");
-            mark.className = "search-hit-highlight";
-            range.surroundContents(mark);
-            return mark;
-          } catch (e) {
-            return null; // surroundContents can fail on odd node boundaries; fail quietly
-          }
-        }
-      }
+      let n;
+      while ((n = walker.nextNode())) textNodes.push(n);
+    });
+    hitMarks = [];
+    textNodes.forEach((node) => {
+      const text = node.nodeValue;
+      const ranges = matchRanges(text, cq);
+      if (!ranges.length) return;
+      const frag = document.createDocumentFragment();
+      let last = 0;
+      ranges.forEach(([s, e]) => {
+        if (s > last) frag.appendChild(document.createTextNode(text.slice(last, s)));
+        const mark = document.createElement("mark");
+        mark.className = "search-hit-highlight";
+        mark.textContent = text.slice(s, e);
+        frag.appendChild(mark);
+        hitMarks.push(mark);
+        last = e;
+      });
+      if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+      node.parentNode.replaceChild(frag, node);
+    });
+
+    let rowEl = null;
+    if (opts && opts.rowIndex !== undefined) {
+      const body = card.querySelector(":scope > .section-body");
+      const wrap = body ? body.children[opts.rowBlock] : null;
+      rowEl = wrap ? wrap.querySelectorAll("tbody tr")[opts.rowIndex] : null;
+      if (rowEl) rowEl.classList.add("row-hit");
     }
-    return null;
+    hitIndex = 0;
+    if (rowEl) {
+      const first = hitMarks.findIndex((m) => rowEl.contains(m));
+      if (first >= 0) hitIndex = first;
+    }
+    if (!hitMarks.length) {
+      updateHitNav();
+      return rowEl;
+    }
+    setCurrentHit(hitIndex, false);
+    return hitMarks[hitIndex];
+  }
+
+  function setCurrentHit(i, scroll) {
+    if (!hitMarks.length) return;
+    hitIndex = (i + hitMarks.length) % hitMarks.length;
+    hitMarks.forEach((m, k) => m.classList.toggle("is-current", k === hitIndex));
+    if (scroll) hitMarks[hitIndex].scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "center" });
+    updateHitNav();
+  }
+
+  function updateHitNav() {
+    if (!hitNavEl) return;
+    const live = hitMarks.length > 0;
+    hitNavEl.hidden = !live;
+    if (live) hitNavEl.querySelector(".hit-count").textContent = (hitIndex + 1) + " of " + hitMarks.length;
+  }
+
+  function wireHitNav() {
+    hitNavEl = document.createElement("div");
+    hitNavEl.className = "hit-nav";
+    hitNavEl.hidden = true;
+    hitNavEl.innerHTML =
+      '<button type="button" class="hit-prev" aria-label="Previous match">▲</button>' +
+      '<span class="hit-count"></span>' +
+      '<button type="button" class="hit-next" aria-label="Next match">▼</button>' +
+      '<button type="button" class="hit-close" aria-label="Clear highlights">✕</button>';
+    document.body.appendChild(hitNavEl);
+    hitNavEl.querySelector(".hit-prev").addEventListener("click", () => setCurrentHit(hitIndex - 1, true));
+    hitNavEl.querySelector(".hit-next").addEventListener("click", () => setCurrentHit(hitIndex + 1, true));
+    hitNavEl.querySelector(".hit-close").addEventListener("click", clearSearchHighlight);
   }
 
   // True when `node` sits inside a .children-wrap that is itself inside
@@ -3696,24 +4065,107 @@ window.COJOINZ_DATA = {
       parent.removeChild(mark);
       parent.normalize();
     });
+    document.querySelectorAll("tr.row-hit").forEach((r) => r.classList.remove("row-hit"));
+    hitMarks = [];
+    updateHitNav();
   }
 
-  /* ---------------- Search / Autocomplete ---------------- */
-
-  let activeIndex = -1;
-  let currentResults = [];
+  /* ---------------- Search box, results and Advanced panel ---------------- */
 
   function wireSearch() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(SEARCH_OPTS_KEY) || "{}");
+      searchOpts.matchCase = !!saved.matchCase;
+      searchOpts.wholeWord = !!saved.wholeWord;
+    } catch (e) { /* storage unavailable: defaults */ }
+
+    const wrap = el.searchInput.closest(".search-wrap");
+    el.searchInput.placeholder = 'Search rules… e.g. "NEW HAND", WAGER, tile*';
+
+    const gear = document.createElement("button");
+    gear.type = "button";
+    gear.className = "search-gear";
+    gear.title = "Advanced search";
+    gear.setAttribute("aria-label", "Advanced search");
+    gear.textContent = "⚙";
+    el.searchInput.insertAdjacentElement("afterend", gear);
+
+    // Drop-down column: Advanced panel above the results.
+    const drop = document.createElement("div");
+    drop.className = "search-drop";
+    searchAdvEl = document.createElement("div");
+    searchAdvEl.className = "search-adv";
+    searchAdvEl.hidden = true;
+    searchAdvEl.innerHTML =
+      '<div class="adv-opts">' +
+      '<label><input type="checkbox" data-opt="matchCase"> Match case</label>' +
+      '<label><input type="checkbox" data-opt="wholeWord"> Whole word</label>' +
+      "</div>" +
+      '<div class="adv-add">' +
+      '<select aria-label="How to combine"><option>AND</option><option>OR</option><option>NOT</option></select>' +
+      '<input type="text" class="adv-term" placeholder="another word or phrase" autocomplete="off" spellcheck="false">' +
+      '<button type="button" class="btn adv-add-btn">Add</button>' +
+      "</div>" +
+      '<div class="adv-help">' +
+      '<b>"exact phrase"</b> · <b>OR</b> · <b>AND</b> (default) · <b>NOT</b> word or <b>-</b>word · ' +
+      '<b>( )</b> group · <b>*</b> any letters · <b>?</b> one letter' +
+      "</div>";
+    drop.appendChild(searchAdvEl);
+    drop.appendChild(el.searchResults);
+    wrap.appendChild(drop);
+
+    searchAdvEl.querySelectorAll("input[data-opt]").forEach((cb) => {
+      cb.checked = !!searchOpts[cb.dataset.opt];
+      cb.addEventListener("change", () => {
+        searchOpts[cb.dataset.opt] = cb.checked;
+        try { localStorage.setItem(SEARCH_OPTS_KEY, JSON.stringify(searchOpts)); } catch (e) { /* not remembered */ }
+        onSearchInput();
+      });
+    });
+    const addTerm = () => {
+      const termEl = searchAdvEl.querySelector(".adv-term");
+      let term = termEl.value.trim();
+      if (!term) return;
+      if (/\s/.test(term) && !QUOTE_RE.test(term)) term = '"' + term + '"';
+      const op = searchAdvEl.querySelector("select").value;
+      const base = el.searchInput.value.trim();
+      el.searchInput.value = base ? base + " " + op + " " + term : (op === "NOT" ? "NOT " + term : term);
+      termEl.value = "";
+      onSearchInput();
+      el.searchInput.focus();
+    };
+    searchAdvEl.querySelector(".adv-add-btn").addEventListener("click", addTerm);
+    searchAdvEl.querySelector(".adv-term").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); addTerm(); }
+    });
+
+    gear.addEventListener("click", () => {
+      searchAdvEl.hidden = !searchAdvEl.hidden;
+      wrap.classList.toggle("adv-open", !searchAdvEl.hidden);
+      gear.classList.toggle("on", !searchAdvEl.hidden);
+      if (!searchAdvEl.hidden) searchAdvEl.querySelector(".adv-term").focus();
+    });
+
     el.searchInput.addEventListener("input", onSearchInput);
     el.searchInput.addEventListener("keydown", onSearchKeydown);
     el.searchInput.addEventListener("focus", () => {
       if (el.searchInput.value.trim()) el.searchResults.hidden = false;
     });
     document.addEventListener("click", (e) => {
-      if (!e.target.closest(".search-wrap")) {
-        el.searchResults.hidden = true;
-      }
+      if (!e.target.closest(".search-wrap")) closeSearchDrop();
     });
+    wireHitNav();
+  }
+
+  function closeSearchDrop() {
+    el.searchResults.hidden = true;
+    if (searchAdvEl && !searchAdvEl.hidden) {
+      searchAdvEl.hidden = true;
+      const wrap = el.searchInput.closest(".search-wrap");
+      wrap.classList.remove("adv-open");
+      const gear = wrap.querySelector(".search-gear");
+      if (gear) gear.classList.remove("on");
+    }
   }
 
   function onSearchInput() {
@@ -3724,11 +4176,15 @@ window.COJOINZ_DATA = {
       el.searchResults.innerHTML = "";
       return;
     }
-    currentResults = search(q, 25);
+    currentResults = search(q, 30);
     renderSearchResults(currentResults, q);
   }
 
   function onSearchKeydown(e) {
+    if (e.key === "Escape") {
+      closeSearchDrop();
+      return;
+    }
     if (el.searchResults.hidden) return;
     const items = Array.from(el.searchResults.querySelectorAll(".search-result-item"));
     if (e.key === "ArrowDown") {
@@ -3747,8 +4203,6 @@ window.COJOINZ_DATA = {
       } else if (currentResults.length) {
         selectResult(currentResults[0], q);
       }
-    } else if (e.key === "Escape") {
-      el.searchResults.hidden = true;
     }
   }
 
@@ -3757,47 +4211,15 @@ window.COJOINZ_DATA = {
     if (items[activeIndex]) items[activeIndex].scrollIntoView({ block: "nearest" });
   }
 
-  function search(query, limit) {
-    const q = query.toLowerCase();
-    const terms = q.split(/\s+/).filter(Boolean);
-    const results = [];
-
-    FLAT_INDEX.forEach((entry) => {
-      const hayTitle = entry.title.toLowerCase();
-      const hayText = (entry.text || "").toLowerCase();
-      const hayId = entry.id.toLowerCase();
-      let score = 0;
-      let matched = true;
-
-      for (const t of terms) {
-        const inTitle = hayTitle.includes(t);
-        const inId = hayId.includes(t);
-        const inText = hayText.includes(t);
-        if (!inTitle && !inId && !inText) {
-          matched = false;
-          break;
-        }
-        if (inId) score += 6;
-        if (inTitle) score += hayTitle.startsWith(t) ? 5 : 3;
-        if (inText) score += 1;
-      }
-      if (matched) {
-        results.push({ entry, score });
-      }
-    });
-
-    results.sort((a, b) => b.score - a.score);
-    return results.slice(0, limit).map((r) => r.entry);
-  }
-
   function renderSearchResults(results, query) {
     el.searchResults.innerHTML = "";
     el.searchResults.hidden = false;
+    const cq = compileQuery(query, searchOpts);
 
     if (!results.length) {
       const empty = document.createElement("div");
       empty.className = "search-empty";
-      empty.textContent = `No matches for "${query}"`;
+      empty.textContent = `No matches for ${query}`;
       el.searchResults.appendChild(empty);
       return;
     }
@@ -3809,31 +4231,28 @@ window.COJOINZ_DATA = {
 
       const pathDiv = document.createElement("div");
       pathDiv.className = "sr-path";
-      pathDiv.textContent = entry.id + " · " + entry.path.slice(0, -1).join(" › ");
-      btn.appendChild(pathDiv);
-
-      // Flag results whose match falls inside a data table so it's clear
-      // there's a table here (and the matched cell may need scrolling to see).
-      if (entry.hasTable && matchIsInTable(entry, query)) {
+      pathDiv.textContent = entry.kind === "row"
+        ? entry.id + " › " + shortTitle(entry.path[entry.path.length - 1])
+        : entry.id + (entry.path.length > 1 ? " · " + shortPath(entry.path.slice(0, -1)) : "");
+      if (entry.kind === "row") {
         const tag = document.createElement("span");
         tag.className = "sr-table-tag";
-        tag.textContent = "TABLE";
+        tag.textContent = "TABLE ROW";
         pathDiv.appendChild(tag);
       }
+      btn.appendChild(pathDiv);
 
       const titleDiv = document.createElement("div");
       titleDiv.className = "sr-title";
-      titleDiv.innerHTML = highlight(entry.title, query);
+      titleDiv.innerHTML = highlightHTML(entry.title, cq);
       btn.appendChild(titleDiv);
 
-      if (entry.text) {
-        const snip = snippetAround(entry.text, query);
-        if (snip) {
-          const snipDiv = document.createElement("div");
-          snipDiv.className = "sr-snippet";
-          snipDiv.innerHTML = highlight(snip, query);
-          btn.appendChild(snipDiv);
-        }
+      const snipText = entry.kind === "row" ? entry.preview : entry.text;
+      if (snipText) {
+        const snipDiv = document.createElement("div");
+        snipDiv.className = "sr-snippet";
+        snipDiv.innerHTML = highlightHTML(snippetAround(snipText, cq), cq);
+        btn.appendChild(snipDiv);
       }
 
       btn.addEventListener("click", () => selectResult(entry, query));
@@ -3841,45 +4260,25 @@ window.COJOINZ_DATA = {
     });
   }
 
-  // True when the query only (or also) matches inside this entry's table
-  // content, as opposed to purely in its title or paragraph text.
-  function matchIsInTable(entry, query) {
-    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-    const hayTable = (entry.tableText || "").toLowerCase();
-    const hayOther = (entry.title + " " + (entry.paragraphText || "")).toLowerCase();
-    return terms.some((t) => hayTable.includes(t) && !hayOther.includes(t));
+  // "Earning Tokenz" from "Earning Tokenz: …"; long sentence titles are cut.
+  function shortTitle(t) {
+    t = String(t || "").split(":")[0].replace(/\*\*/g, "").trim();
+    return t.length > 32 ? t.slice(0, 31).trim() + "…" : t;
+  }
+
+  // Last two ancestors only, e.g. "… › T-PAIR Share Rule › Exemptions to…"
+  function shortPath(titles) {
+    const tail = titles.slice(-2).map(shortTitle);
+    return (titles.length > 2 ? "… › " : "") + tail.join(" › ");
   }
 
   function selectResult(entry, query) {
-    el.searchResults.hidden = true;
+    closeSearchDrop();
     el.searchInput.value = "";
-    navigateTo(entry.id, query);
+    el.searchInput.blur();
+    const rowOpts = entry.kind === "row" ? { rowBlock: entry.blockIndex, rowIndex: entry.rowIndex } : null;
+    navigateTo(entry.id, query, null, rowOpts);
     closeSidebarOnMobile();
-  }
-
-  function snippetAround(text, query) {
-    const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
-    const lower = text.toLowerCase();
-    let idx = -1;
-    for (const t of terms) {
-      idx = lower.indexOf(t);
-      if (idx !== -1) break;
-    }
-    if (idx === -1) return text.slice(0, 100);
-    const start = Math.max(0, idx - 40);
-    const end = Math.min(text.length, idx + 100);
-    return (start > 0 ? "…" : "") + text.slice(start, end) + (end < text.length ? "…" : "");
-  }
-
-  function highlight(text, query) {
-    const terms = query
-      .split(/\s+/)
-      .filter(Boolean)
-      .map(escapeRegExp)
-      .sort((a, b) => b.length - a.length);
-    if (!terms.length) return escapeHTML(text);
-    const re = new RegExp("(" + terms.join("|") + ")", "ig");
-    return escapeHTML(text).replace(re, "<mark>$1</mark>");
   }
 
   /* ---------------- Sidebar toggle (mobile) ---------------- */
