@@ -336,6 +336,17 @@ a.xref:hover { color: #4ade80; }
 }
 .block-paragraph:last-child { margin-bottom: 0; }
 .block-paragraph mark { background-color: var(--gold); color: #1a1a1a; border-radius: 3px; padding: 0 2px; }
+/* Layered rule text (set by the paragraph's opening characters, so it
+   survives Excel export/import):
+     "In short: …"  summary line      "• …"  bullet      "– …"  sub-bullet
+     "1. …"         numbered step     "Tip: …"  tip */
+.block-paragraph.is-short { border-left: 3px solid var(--accent-glow); padding-left: 12px; color: var(--text-color); }
+.block-paragraph.is-short .lead, .block-paragraph.is-tip .lead { font-weight: 700; }
+.block-paragraph.is-bullet, .block-paragraph.is-step, .block-paragraph.is-sub { margin-bottom: 4px; padding-left: 20px; text-indent: -14px; }
+.block-paragraph.is-sub { padding-left: 40px; }
+.block-paragraph.is-step { padding-left: 24px; text-indent: -18px; }
+.block-paragraph.is-tip { font-style: italic; color: var(--text-muted); margin-top: 12px; }
+.block-paragraph.is-heading { margin: 14px 0 6px; }
 
 .children-wrap { margin-top: 8px; display: flex; flex-direction: column; gap: 10px; }
 .children-wrap .section-card { margin-bottom: 0; background-color: var(--card-bg-2); }
@@ -1272,7 +1283,7 @@ window.COJOINZ_DATA = {
                     [
                       "WAGER | ALL TILES",
                       "Standard -  Special Session",
-                      "SPECIAL SESSION that pauses Grid play and starts a WAGER Session in which all Players will automatically participate. All Players will ante and then wager (one raise) with face-down Tokenz in their Wager Pool, based on the total of all of their Letter Tiles. Based on the WAGER Session's Wagering Round's result (whose hand is called), the Player who received the final Call will announce their hand's total point value. If any competing Player has a higher hand point value, they will announce theirs; the Player declaring the highest-scoring hand will reveal their entire hand to the other Players, and the highest scoring hand wins. Players who Fold or Called (but who are not in the announced highest-hand contention) are not required to show any Letter Tiles in their hand.",
+                      "Starts a WAGER Session [see 3.5.2.2]. Goal: the highest total points for all the Letter Tiles in your hand.",
                       "0",
                       "10",
                       "1",
@@ -1281,7 +1292,7 @@ window.COJOINZ_DATA = {
                     [
                       "WAGER | BEST TILE",
                       "Standard -  Special Session",
-                      "SPECIAL SESSION that pauses Grid play and starts a WAGER Session in which all Players will automatically participate. All Players will ante and then wager (one raise) with face-down Tokenz in their Wager Pool, based on their Letter Tile that contains the highest-point value in their hand (the \"Best Tile\"). Based on the WAGER Session's Wagering Round's result (whose hand is called), the Player who received the final Call will announce their Best Tile's point value. If any competing Player has a Letter Tile with a higher point value, they will announce theirs; the Player declaring the highest-scoring hand will reveal their single highest-value tile to the other Players, and the highest scoring Letter Tile wins. Players who Fold or Called (but who are not in the announced highest-hand contention) are not required to show any Letter Tiles in their hand.",
+                      "Starts a WAGER Session [see 3.5.2.2]. Goal: your single highest-point Letter Tile.",
                       "0",
                       "10",
                       "1",
@@ -1290,7 +1301,7 @@ window.COJOINZ_DATA = {
                     [
                       "WAGER | BEST WORD",
                       "Standard -  Special Session",
-                      "SPECIAL SESSION that pauses Grid play and starts a WAGER Session in which all Players will automatically participate. All Players will ante and then wager (one raise) with face-down Tokenz in their Wager Pool, based on their hand's highest-point value word in their hand (the \"Best Word\"). Based on the WAGER Session's Wagering Round's result (whose hand is called), the Player who received the final Call will announce their Best Word's point value. If any competing Player has a word with a higher point value, they will announce theirs; the Player declaring the highest-scoring word will reveal these Letter Tiles to the other Players, and the highest scoring word wins. Players who Fold or Called (but who are not in the announced highest-hand contention) are not required to show any Letter Tiles in their hand.",
+                      "Starts a WAGER Session [see 3.5.2.2]. Goal: your highest-scoring valid word, using only the Letter Tiles in your hand.",
                       "0",
                       "10",
                       "1",
@@ -1517,7 +1528,7 @@ window.COJOINZ_DATA = {
                             },
                             {
                               "id": "2.2.1.1.1.1.3",
-                              "title": "WAGER Session payoff: the Winning Player who won the payoff \"pot\" keeps all Tokenz [see Rule 3.5.2.2.9]",
+                              "title": "WAGER Session payoff: the Winning Player who won the payoff \"pot\" keeps all Tokenz [see Rule 3.5.2.2.8]",
                               "depth": 7,
                               "blocks": [],
                               "children": []
@@ -1754,260 +1765,355 @@ window.COJOINZ_DATA = {
                 },
                 {
                   "id": "3.5.2.2",
-                  "title": "\"WAGER\" Action Tokenz & WAGER Sessions:",
+                  "title": "WAGER Sessions",
                   "depth": 4,
                   "blocks": [
                     {
                       "type": "paragraph",
-                      "text": "A highly distinctive feature of the CoJoinz Letterz game is the \"WAGER\" Action Tokenz. These Tokenz create a SPECIAL SESSION called a \"WAGER Session\" that temporarily pauses Grid Play. A WAGER Session is completely unlike standard Grid Play because it creates an interactive gameplay with all Players participating in a \"poker-like\" wagering round to win the \"pot\" of wagered Tokenz (based on the requirements of any of the three variants of \"WAGER\" Action Tokenz in play). Success is achieved through a combination of skillful choices that balance luck (the comparative strength of a Player's hand in relation to the specific goal of the \"WAGER\" Action Tokenz) with strategy (mostly through a creative use of wagering that is not directly based on the strength of one's hand). A WAGER Session is not a substitute for Grid Play and it is played before the Active Player's Grid Play."
+                      "text": "In short: A WAGER Action Tokenz pauses Grid Play for a poker-style round. Every Player bets Tokenz on whose hand best meets the WAGER goal. The winner takes all the Tokenz in the pot."
+                    },
+                    {
+                      "type": "paragraph",
+                      "text": "**The three WAGER goals**"
+                    },
+                    {
+                      "type": "table",
+                      "caption": "",
+                      "headers": [
+                        "WAGER Tokenz",
+                        "Best hand wins",
+                        "The winner reveals"
+                      ],
+                      "rows": [
+                        [
+                          "ALL TILES",
+                          "Highest total points of all the Letter Tiles in your hand",
+                          "Their whole hand"
+                        ],
+                        [
+                          "BEST TILE",
+                          "Your single highest-point Letter Tile",
+                          "That one Letter Tile"
+                        ],
+                        [
+                          "BEST WORD",
+                          "Your highest-scoring valid word, using only the Letter Tiles in your hand",
+                          "The Letter Tiles of that word"
+                        ]
+                      ]
+                    },
+                    {
+                      "type": "paragraph",
+                      "text": "• Points means Play Points. Wild Letter Tiles score 0, but may be used to spell a BEST WORD."
+                    },
+                    {
+                      "type": "paragraph",
+                      "text": "**Steps**"
+                    },
+                    {
+                      "type": "paragraph",
+                      "text": "1. Start: the Active Player plays the WAGER Tokenz."
+                    },
+                    {
+                      "type": "paragraph",
+                      "text": "2. Wager Pools: every Player sets aside 6 Tokenz to bet with."
+                    },
+                    {
+                      "type": "paragraph",
+                      "text": "3. Ante: every Player puts 1 Tokenz into the pot."
+                    },
+                    {
+                      "type": "paragraph",
+                      "text": "4. Wagering Round: Players Open, Call, Raise or Fold."
+                    },
+                    {
+                      "type": "paragraph",
+                      "text": "5. Showdown: Players announce what their hands are worth."
+                    },
+                    {
+                      "type": "paragraph",
+                      "text": "6. Reveal: the winner proves their hand."
+                    },
+                    {
+                      "type": "paragraph",
+                      "text": "7. Payoff: the winner takes the pot."
+                    },
+                    {
+                      "type": "paragraph",
+                      "text": "8. The Active Player then takes their Grid Play or Passes."
+                    },
+                    {
+                      "type": "paragraph",
+                      "text": "• No real money is used. Tokenz are the only currency."
                     }
                   ],
                   "children": [
                     {
                       "id": "3.5.2.2.1",
-                      "title": "Tokenz As Currency:",
+                      "title": "Starting a WAGER Session",
                       "depth": 5,
                       "blocks": [
                         {
                           "type": "paragraph",
-                          "text": "As in most \"poker\" games, Players compete to win the \"pot\" that they jointly create by wagering (including the initial \"ante\" - or \"pay to play\" fee). Unlike real \"poker\" games, no actual money is ever used in CoJoinz WAGER Sessions, and all wagering is done using only Tokenz (both Tokenz types count equally) as the \"currency\" in a collection called a \"Wager Pool\" (for each individual Player)."
+                          "text": "• The Active Player places their WAGER Tokenz in front of their Game Rack, before any Grid Play."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• The Scorekeeper announces the start of the WAGER Session and opens its section in Scorz. Scorz records everything that happens in the Session."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• Every Player takes part."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• No word lookups are allowed until the Session ends."
                         }
                       ],
                       "children": []
                     },
                     {
                       "id": "3.5.2.2.2",
-                      "title": "WAGER Session Activation:",
+                      "title": "Wager Pools",
                       "depth": 5,
-                      "blocks": [],
-                      "children": [
+                      "blocks": [
                         {
-                          "id": "3.5.2.2.2.1",
-                          "title": "A WAGER Session begins when a Player chooses to play their \"WAGER\" Action Tokenz (one of three variants that each specify a unique goal for which the Players to compete to win) by placing it directly in front of their Game Rack.",
-                          "depth": 6,
-                          "blocks": [],
-                          "children": []
+                          "type": "paragraph",
+                          "text": "In short: Each Player bets from a Wager Pool of exactly 6 Tokenz, kept face-down."
                         },
                         {
-                          "id": "3.5.2.2.2.2",
-                          "title": "The Scorekeeper then announces the official start of the WAGER SESSION while opening a dedicated \"WAGER SESSION\" section in the CoJoinz Scorz tool, where all WAGER SESSION activity will be tallied.",
-                          "depth": 6,
-                          "blocks": [],
-                          "children": []
+                          "type": "paragraph",
+                          "text": "• Choose 6 of your Tokenz and place them face-down in front of you. Keep any others in your hand."
                         },
                         {
-                          "id": "3.5.2.2.2.3",
-                          "title": "Each Player will set up their individual \"Wager Pool\" and the Scorekeeper will issue any required T-PAIRS.",
-                          "depth": 6,
-                          "blocks": [],
-                          "children": []
+                          "type": "paragraph",
+                          "text": "• The Active Player's WAGER Tokenz is one of their 6."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• In a WAGER Session every Tokenz is worth 1, whatever its type, face value or Hand Points."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• Fewer than 6 Tokenz? The Scorekeeper lends you T-PAIRs from the bank:"
+                        },
+                        {
+                          "type": "table",
+                          "caption": "",
+                          "headers": [
+                            "Tokenz you hold",
+                            "T-PAIRs you borrow"
+                          ],
+                          "rows": [
+                            [
+                              "4–5",
+                              "1"
+                            ],
+                            [
+                              "2–3",
+                              "2"
+                            ],
+                            [
+                              "0–1",
+                              "3"
+                            ]
+                          ]
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• Borrowed T-PAIRs are recorded in Scorz as T-PAIR Debt [see 3.5.2.2.3]."
                         }
-                      ]
+                      ],
+                      "children": []
                     },
                     {
                       "id": "3.5.2.2.3",
-                      "title": "\"Wager Pools\":",
+                      "title": "T-PAIR Debt",
                       "depth": 5,
-                      "blocks": [],
-                      "children": [
+                      "blocks": [
                         {
-                          "id": "3.5.2.2.3.1",
-                          "title": "Each Player will wager only with Tokenz within their individual \"Wager Pool\" of 6 total Tokenz (that remain face-down throughout the WAGER Session).",
-                          "depth": 6,
-                          "blocks": [],
-                          "children": []
+                          "type": "paragraph",
+                          "text": "In short: Borrowed T-PAIRs must be paid back to the bank. No interest is charged."
                         },
                         {
-                          "id": "3.5.2.2.3.2",
-                          "title": "Players who hold 6 or more Tokenz at the beginning of the WAGER Session will place their chosen 6 Tokenz face-down in front of them. (The standard \"face value\" and Hand Points of each Tokenz is not relevant in WAGER Sessions as each Tokenz simply becomes a proxy as a single unit of WAGER Session \"currency\" with a value of one)",
-                          "depth": 6,
-                          "blocks": [],
-                          "children": []
+                          "type": "paragraph",
+                          "text": "• During the game, Scorz takes your debt out of the next T-PAIRs you earn in Grid Play. Those T-PAIRs go straight to the bank, with no T-PAIR Share."
                         },
                         {
-                          "id": "3.5.2.2.3.3",
-                          "title": "Players who hold fewer than 6 Tokenz at the beginning of the WAGER Session will automatically receive a minimum of one random T-PAIR from the \"bank\" (via the Scorekeeper); two T-PAIRS, if the Player currently possesses 2-3 Tokenz; three T-PAIRS if they possess 0-1 Tokenz. The Scorekeeper will record all borrowed T-PAIRS in the Scorz tool as \"T-PAIR Debt\", and each Player will then place their chosen 6 Tokenz face-down in front of them.",
-                          "depth": 6,
-                          "blocks": [],
-                          "children": []
+                          "type": "paragraph",
+                          "text": "• At the end of the game, any debt left is paid:"
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "1. First with your own Tokenz, 1 for 1 (any type)."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "2. Then with points: −60 for each whole T-PAIR still owed, and −30 for a leftover single Tokenz."
                         }
-                      ]
+                      ],
+                      "children": []
                     },
                     {
                       "id": "3.5.2.2.4",
-                      "title": "\"T-PAIR Debt\"",
+                      "title": "The Ante and the Pot",
                       "depth": 5,
-                      "blocks": [],
-                      "children": [
+                      "blocks": [
                         {
-                          "id": "3.5.2.2.4.1",
-                          "title": "All T-PAIR Debt will be automatically logged within the Scorz tool and deducted from each Player's future T-PAIRS that are earned through standard Grid Play.",
-                          "depth": 6,
-                          "blocks": [],
-                          "children": []
+                          "type": "paragraph",
+                          "text": "• Every Player puts 1 Tokenz from their Wager Pool into the pot, in the center of the table. This is the ante (the fee to play)."
                         },
                         {
-                          "id": "3.5.2.2.4.2",
-                          "title": "At the end of the game, any unpaid T-PAIR debt will be repaid (with no \"interest\") to the bank:",
-                          "depth": 6,
-                          "blocks": [],
-                          "children": [
-                            {
-                              "id": "3.5.2.2.4.2.1",
-                              "title": "Firstly, by the Players' physical Tokenz (at a 1-for-1 rate, regardless of type).",
-                              "depth": 7,
-                              "blocks": [],
-                              "children": []
-                            },
-                            {
-                              "id": "3.5.2.2.4.2.2",
-                              "title": "Secondly, (if the Player holds no remaining physical Tokenz) via preset point value deductions for each Tokenz (Action Tokenz = 20 points/each; Bonus Tokenz = 40 points/each); both of these repayment values include an average of Hand Points (10 for each Action Tokenz; 20 for each Bonus Tokenz).",
-                              "depth": 7,
-                              "blocks": [],
-                              "children": []
-                            }
-                          ]
+                          "type": "paragraph",
+                          "text": "• The Active Player's WAGER Tokenz is their ante."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• After the ante, every Player has 5 Tokenz left to bet."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• Every bet also goes into the pot."
                         }
-                      ]
+                      ],
+                      "children": []
                     },
                     {
                       "id": "3.5.2.2.5",
-                      "title": "The \"Pot\" and \"Ante\":",
-                      "depth": 5,
-                      "blocks": [],
-                      "children": [
-                        {
-                          "id": "3.5.2.2.5.1",
-                          "title": "All initial Tokenz (called the \"ante\" - a \"Pay-to-Play\" fee) are placed into the Tokenz \"pot\" (centrally-located), and, when wagering begins, all wagered Tokenz will also be added to the pot. All Players will immediately deposit one Tokenz (of either type) into the pot as their ante, and the Active Player’s WAGER Action Tokenz will count as their ante. Each ante requires just one Tokenz from each Player, and this leaves 5 Tokenz that may be (optionally) used for wagering from within each Player's Wager Pool.",
-                          "depth": 6,
-                          "blocks": [],
-                          "children": []
-                        }
-                      ]
-                    },
-                    {
-                      "id": "3.5.2.2.6",
-                      "title": "The Wagering Round:",
+                      "title": "The Wagering Round",
                       "depth": 5,
                       "blocks": [
                         {
                           "type": "paragraph",
-                          "text": "Wagering is a fun and complex balancing act between luck and strategy. The action called \"Bluffing\" is an especially important wagering strategy as it can often result in a win even if the Player's actual hand is not the best in the WAGER Session. Bluffing involves using your wagers and body language to project confidence, convincing other players your hand is strong (potentially stronger than it actually is), in order to ultimately trick them into folding.  Of course, there are risks in that Players cannot know the strength of other Players' hands, nor can anyone know how effectively other Players can use Bluffing, but effective Bluffing usually increases the odds of winning."
+                          "text": "In short: Starting at the Active Player's left, each Player bets, matches the bet or drops out. Each Player may Raise only once."
                         },
                         {
                           "type": "paragraph",
-                          "text": "Players who are newer to \"poker-like\" games often underestimate the power of Bluffing and will assume that their wagering should be based solely on how strong their hand is (in relation to the specific goal of the played \"WAGER\" Action Tokenz). This approach relies exclusively on luck (the Player's hand strength versus that of other Players), but it typically results in failure when other Players are using strategic Bluffing."
+                          "text": "**Before anyone has bet**"
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• The Player to the Active Player's left goes first. They choose one:"
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "– Open: bet 1–5 Tokenz face-down into the pot."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "– Pass (or Check): bet nothing. The choice moves to the next Player."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• If every Player before the Active Player passes, the Active Player must Open."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "**After someone has bet**"
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• You can no longer Pass. On your turn, choose one:"
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "– Call: match the highest bet so far (called \"the Price\")."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "– Raise: Call, then bet more Tokenz from your Wager Pool. Only once per Session."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "– Fold: say \"I fold\" and drop out. Your Tokenz in the pot stay there. Keep the rest of your Wager Pool."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• If other Players Raise, you may need to Call more than once to stay in."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "**When the round ends**"
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• The round ends when every Player still in has matched the highest bet."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• If all but one Player Folds, that Player wins the pot at once. There is no Showdown."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "Tip: A strong hand often wins, but not always. A bold bet can make others Fold, even when your hand is weak. This is called Bluffing. New players often bet only on how good their hand is, so watch out for bluffers."
                         }
                       ],
-                      "children": [
-                        {
-                          "id": "3.5.2.2.6.1",
-                          "title": "Opening Wager:",
-                          "depth": 6,
-                          "blocks": [
-                            {
-                              "type": "paragraph",
-                              "text": "Following the ante, a single Wagering round starts with the Player to the Active Player's left and they have the option of wagering with the \"Opening Wager\" (\"Open\" for short)."
-                            }
-                          ],
-                          "children": [
-                            {
-                              "id": "3.5.2.2.6.1.1",
-                              "title": "The \"Opening\" Options:",
-                              "depth": 7,
-                              "blocks": [
-                                {
-                                  "type": "paragraph",
-                                  "text": "Wager: The Player may choose to wager with 1-5 Tokenz remaining in their Wager Pool."
-                                },
-                                {
-                                  "type": "paragraph",
-                                  "text": "\"Pass\" or \"Check\": If this Player chooses not to wager (called a \"Pass\" or \"Check\"), they pass the Open option to the next Player in rotation. If all Players pass prior to the Active Player, then the Active Player leads with the Opening Wager (with 1-5 Tokenz remaining in their Wager Pool) by placing one or more Tokenz face-down into the pot. The option to Pass is only valid if no Tokenz have already been wagered."
-                                }
-                              ],
-                              "children": []
-                            },
-                            {
-                              "id": "3.5.2.2.6.1.2",
-                              "title": "Post-Open Options:",
-                              "depth": 7,
-                              "blocks": [
-                                {
-                                  "type": "paragraph",
-                                  "text": "Because the option to Pass is only valid if no Tokenz have already been wagered, in order to \"stay alive\" (in the WAGER Session), Players must match or increase the highest wager yet played; using typical poker rules, the only options are:\n\"Call\": The current Player matches the current highest wager (aka: \"the Price\" to call -or- \"the Price\" for short).\n\"Call and Raise\" (usually shortened to \"Raise\"): The current Player must first Call the Price, then may add to it with their Raise (limited to the Player's remaining Wager Pool Tokenz). Players may Raise only once during each WAGER Session, but it is often necessary for them to Call more than once in order to \"stay alive\" from other Players' Raises."
-                                },
-                                {
-                                  "type": "paragraph",
-                                  "text": "Alternatively, if the Player chooses to stop participating in the WAGER Session, their only option is to \"Fold\"; the Player announces \"I fold\", stops participating in the WAGER Session, and surrenders the Tokenz they already contributed to the pot (while keeping any Tokenz remaining in their Wager Pool)."
-                                }
-                              ],
-                              "children": []
-                            }
-                          ]
-                        }
-                      ]
+                      "children": []
                     },
                     {
-                      "id": "3.5.2.2.7",
-                      "title": "Showdown:",
+                      "id": "3.5.2.2.6",
+                      "title": "Showdown",
                       "depth": 5,
                       "blocks": [
                         {
                           "type": "paragraph",
-                          "text": "Once the Wagering round ends, the Player who received the last Call will announce the total point value of their Letter Tiles (according to the specific goal of the played \"WAGER\" Action Tokenz) and all remaining Players will then announce theirs, in rotation. In the case of the \"WAGER - BEST WORD\" Action Tokenz, all Players' words must be valid (per the Word Validity rule), but Players may not use word lookups during WAGER Sessions."
+                          "text": "• The Player who received the last Call says what their hand is worth for the WAGER goal."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• Then, in turn, each other Player still in announces their hand only if it beats or ties the best so far. Players who cannot beat it stay silent."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• BEST WORD: every word must be valid [see 3.1]."
+                        }
+                      ],
+                      "children": []
+                    },
+                    {
+                      "id": "3.5.2.2.7",
+                      "title": "The Reveal",
+                      "depth": 5,
+                      "blocks": [
+                        {
+                          "type": "paragraph",
+                          "text": "• Only the Player with the best announced hand shows their Letter Tiles, to prove it [see 3.5.2.2]. Other Players do not show theirs."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• Tie: if two or more Players have the same best hand, they all reveal. They split the pot evenly, and any Tokenz left over goes back to the bank."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• BEST WORD: if the winning word is not valid, that Player is out, and the Showdown is repeated without them."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• If no valid hand is left, the pot goes to the bank. Players take back their unused Wager Pool Tokenz. T-PAIR Debt still stands."
                         }
                       ],
                       "children": []
                     },
                     {
                       "id": "3.5.2.2.8",
-                      "title": "The \"Reveal\":",
+                      "title": "Payoff and Session End",
                       "depth": 5,
                       "blocks": [
                         {
                           "type": "paragraph",
-                          "text": "Only the surviving Player (whose hand was Called) who has just announced the winning hand must physically reveal their Letter Tiles (per the \"WAGER\" Action Tokenz's goal) to validate the winning hand."
-                        }
-                      ],
-                      "children": [
-                        {
-                          "id": "3.5.2.2.8.1",
-                          "title": "WAGER Invalid Words:",
-                          "depth": 6,
-                          "blocks": [
-                            {
-                              "type": "paragraph",
-                              "text": "In the case of \"WAGER - BEST WORD\" Action Tokenz, if a constructed word is ruled invalid, that Player is automatically disqualified, and the Player with the next-best scoring hand winds. If there are no winners, then the pot is returned to the \"bank\", while all unused Wager Pool Tokenz are returned to their Player's hand, and T-PAIR Debt remains in play."
-                            }
-                          ],
-                          "children": []
-                        }
-                      ]
-                    },
-                    {
-                      "id": "3.5.2.2.9",
-                      "title": "Payoff & Resolution:",
-                      "depth": 5,
-                      "blocks": [
-                        {
-                          "type": "paragraph",
-                          "text": "The winning Player collects all Tokenz within the pot, and each Player returns their remaining Wager Pool Tokenz to their Game Rack."
-                        }
-                      ],
-                      "children": []
-                    },
-                    {
-                      "id": "3.5.2.2.10",
-                      "title": "Session End:",
-                      "depth": 5,
-                      "blocks": [
-                        {
-                          "type": "paragraph",
-                          "text": "The Scorekeeper tallies and announces the results of the WAGER Session, ending that Special Session."
+                          "text": "• The winner takes every Tokenz in the pot. The T-PAIR Share does not apply: they keep them all."
                         },
                         {
                           "type": "paragraph",
-                          "text": "Play now returns to the Active Player who may choose to Pass their turn to the next Player in rotation, or they may Grid Play."
+                          "text": "• Every Player returns their unused Wager Pool Tokenz to their Game Rack."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• The Scorekeeper records and announces the results. The Session ends."
+                        },
+                        {
+                          "type": "paragraph",
+                          "text": "• The Active Player then takes their Grid Play or Passes."
                         }
                       ],
                       "children": []
@@ -2425,15 +2531,7 @@ window.COJOINZ_DATA = {
           "blocks": [
             {
               "type": "paragraph",
-              "text": "For Players whose T-PAIR Debt was not repaid to the \"bank\" during gameplay, the following points will be deducted from their score for each remaining T-PAIR Debt Tokenz:"
-            },
-            {
-              "type": "paragraph",
-              "text": "Action Tokenz: 20 Points"
-            },
-            {
-              "type": "paragraph",
-              "text": "Bonus Tokenz: 40 Points"
+              "text": "Any T-PAIR Debt still owed at the end of the game is paid as set out in the WAGER rules [see 3.5.2.2.3]."
             }
           ],
           "children": []
@@ -2560,33 +2658,35 @@ window.COJOINZ_DATA = {
     { anchor: "anytime-action-tokenz",     title: /^\W*Anytime\W+Action Tokenz:?\s*$/i, fallbackId: "3.5.1" },
     { anchor: "special-sessions",          title: /^SPECIAL SESSION Action Tokenz/i, fallbackId: "3.5.2" },
     { anchor: "trade-time",                title: /^\W*TRADE TIME/i, fallbackId: "3.5.2.1" },
-    { anchor: "wager-sessions",            title: /^\W*WAGER\W+Action Tokenz\s*&\s*WAGER Sessions/i, fallbackId: "3.5.2.2" },
-    { anchor: "wager",                     title: /^\W*WAGER\W+Action Tokenz\s*&\s*WAGER Sessions/i, fallbackId: "3.5.2.2" },
-    { anchor: "wager-currency",            title: /^Tokenz As Currency/i, fallbackId: "3.5.2.2.1" },
-    { anchor: "wager-activation",          title: /^WAGER Session Activation/i, fallbackId: "3.5.2.2.2" },
-    { anchor: "wager-activation-start",    title: /^(A )?WAGER Sessions? begins? when/i, fallbackId: "3.5.2.2.2.1" },
-    { anchor: "wager-activation-scorz",    title: /^The Scorekeeper then announces/i, fallbackId: "3.5.2.2.2.2" },
-    { anchor: "wager-activation-pools",    title: /^Each Player will set up their individual/i, fallbackId: "3.5.2.2.2.3" },
-    { anchor: "wager-pools",               title: /^\W*Wager Pools\W*$/i, fallbackId: "3.5.2.2.3" },
-    { anchor: "wager-pool-size",           title: /^Each Player will wager only/i, fallbackId: "3.5.2.2.3.1" },
-    { anchor: "wager-pool-six-plus",       title: /^Players who (currently possess|hold) 6 or more/i, fallbackId: "3.5.2.2.3.2" },
-    { anchor: "wager-pool-under-six",      title: /^Players who (currently possess|hold) fewer than 6/i, fallbackId: "3.5.2.2.3.3" },
-    { anchor: "t-pair-debt",               title: /^\W*T-PAIR Debt\W*$/i, fallbackId: "3.5.2.2.4" },
-    { anchor: "t-pair-debt-logging",       title: /^All T-PAIR Debt will be/i, fallbackId: "3.5.2.2.4.1" },
-    { anchor: "t-pair-debt-repayment",     title: /^At the end of the game, any unpaid/i, fallbackId: "3.5.2.2.4.2" },
-    { anchor: "debt-repay-tokenz",         title: /^Firstly/i, fallbackId: "3.5.2.2.4.2.1" },
-    { anchor: "debt-repay-points",         title: /^Secondly/i, fallbackId: "3.5.2.2.4.2.2" },
-    { anchor: "wager-pot-ante",            title: /^The\W+Pot\W+and\W+Ante/i, fallbackId: "3.5.2.2.5" },
-    { anchor: "wager-ante",                title: /^All initial Tokenz/i, fallbackId: "3.5.2.2.5.1" },
-    { anchor: "wagering-round",            title: /^The Wagering Round/i, fallbackId: "3.5.2.2.6" },
-    { anchor: "opening-wager",             title: /^Opening Wager/i, fallbackId: "3.5.2.2.6.1" },
-    { anchor: "opening-options",           title: /^The\W+Opening\W+Options/i, fallbackId: "3.5.2.2.6.1.1" },
-    { anchor: "post-open-options",         title: /^Post-Open Options/i, fallbackId: "3.5.2.2.6.1.2" },
-    { anchor: "wager-showdown",            title: /^Showdown/i, fallbackId: "3.5.2.2.7" },
-    { anchor: "wager-reveal",              title: /^The\W+Reveal/i, fallbackId: "3.5.2.2.8" },
-    { anchor: "wager-invalid-words",       title: /^WAGER Invalid Words/i, fallbackId: "3.5.2.2.8.1" },
-    { anchor: "wager-payoff",              title: /^Payoff\s*&\s*Resolution/i, fallbackId: "3.5.2.2.9" },
-    { anchor: "wager-session-end",         title: /^Session End/i, fallbackId: "3.5.2.2.10" },
+    // WAGER (rewritten 2026-10): every old anchor is kept and now points to
+    // the flattened section that holds that content.
+    { anchor: "wager-sessions",            title: /^WAGER Sessions\W*$/i, fallbackId: "3.5.2.2" },
+    { anchor: "wager",                     title: /^WAGER Sessions\W*$/i, fallbackId: "3.5.2.2" },
+    { anchor: "wager-currency",            title: /^WAGER Sessions\W*$/i, fallbackId: "3.5.2.2" },
+    { anchor: "wager-activation",          title: /^Starting a WAGER Session/i, fallbackId: "3.5.2.2.1" },
+    { anchor: "wager-activation-start",    title: /^Starting a WAGER Session/i, fallbackId: "3.5.2.2.1" },
+    { anchor: "wager-activation-scorz",    title: /^Starting a WAGER Session/i, fallbackId: "3.5.2.2.1" },
+    { anchor: "wager-pools",               title: /^\W*Wager Pools\W*$/i, fallbackId: "3.5.2.2.2" },
+    { anchor: "wager-activation-pools",    title: /^\W*Wager Pools\W*$/i, fallbackId: "3.5.2.2.2" },
+    { anchor: "wager-pool-size",           title: /^\W*Wager Pools\W*$/i, fallbackId: "3.5.2.2.2" },
+    { anchor: "wager-pool-six-plus",       title: /^\W*Wager Pools\W*$/i, fallbackId: "3.5.2.2.2" },
+    { anchor: "wager-pool-under-six",      title: /^\W*Wager Pools\W*$/i, fallbackId: "3.5.2.2.2" },
+    { anchor: "t-pair-debt",               title: /^\W*T-PAIR Debt\W*$/i, fallbackId: "3.5.2.2.3" },
+    { anchor: "t-pair-debt-logging",       title: /^\W*T-PAIR Debt\W*$/i, fallbackId: "3.5.2.2.3" },
+    { anchor: "t-pair-debt-repayment",     title: /^\W*T-PAIR Debt\W*$/i, fallbackId: "3.5.2.2.3" },
+    { anchor: "debt-repay-tokenz",         title: /^\W*T-PAIR Debt\W*$/i, fallbackId: "3.5.2.2.3" },
+    { anchor: "debt-repay-points",         title: /^\W*T-PAIR Debt\W*$/i, fallbackId: "3.5.2.2.3" },
+    { anchor: "wager-pot-ante",            title: /^The\W+Ante\W+and\W+the\W+Pot/i, fallbackId: "3.5.2.2.4" },
+    { anchor: "wager-ante",                title: /^The\W+Ante\W+and\W+the\W+Pot/i, fallbackId: "3.5.2.2.4" },
+    { anchor: "wagering-round",            title: /^The Wagering Round/i, fallbackId: "3.5.2.2.5" },
+    { anchor: "opening-wager",             title: /^The Wagering Round/i, fallbackId: "3.5.2.2.5" },
+    { anchor: "opening-options",           title: /^The Wagering Round/i, fallbackId: "3.5.2.2.5" },
+    { anchor: "post-open-options",         title: /^The Wagering Round/i, fallbackId: "3.5.2.2.5" },
+    { anchor: "wager-showdown",            title: /^Showdown/i, fallbackId: "3.5.2.2.6" },
+    { anchor: "wager-reveal",              title: /^The\W+Reveal/i, fallbackId: "3.5.2.2.7" },
+    { anchor: "wager-invalid-words",       title: /^The\W+Reveal/i, fallbackId: "3.5.2.2.7" },
+    { anchor: "wager-payoff",              title: /^Payoff and Session End/i, fallbackId: "3.5.2.2.8" },
+    { anchor: "wager-session-end",         title: /^Payoff and Session End/i, fallbackId: "3.5.2.2.8" },
     { anchor: "remove-tokenz",             title: /^\W*REMOVE\W+Action Tokenz\s*&/i, fallbackId: "3.5.3" },
     { anchor: "remove-1-tile",             title: /^\W*REMOVE 1 Tile/i, fallbackId: "3.5.3.1" },
     { anchor: "remove-2-tiles",            title: /^\W*REMOVE 2 Tiles/i, fallbackId: "3.5.3.2" },
@@ -2884,12 +2984,12 @@ window.COJOINZ_DATA = {
 
     const hasChildren = node.children && node.children.length > 0;
     const hasBlocks = (node.blocks || []).length > 0;
-    const hasTable = (node.blocks || []).some((b) => b.type === "table");
+    const hasTable = (node.blocks || []).some((b) => b.type === "table" && (b.rows || []).length > 10);
     // Anything with content below its heading can be expanded/collapsed.
     const collapsible = hasChildren || hasBlocks;
     // Parents start closed (except the first chapter). Leaf sections start
     // open, except big data tables (e.g. the Tokenz lists), which start
-    // closed so they don't swamp the page.
+    // closed so they don't swamp the page (small tables stay open).
     const startOpen = hasChildren ? defaultOpen : !hasTable;
 
     let caret = null;
@@ -2975,6 +3075,34 @@ window.COJOINZ_DATA = {
     elm._renderedText = elm.textContent;
   }
 
+  // Paragraph = rich text + a layout class picked from its opening characters
+  // (see the "Layered rule text" CSS). "In short:" / "Tip:" leads are bold.
+  function paragraphKind(text) {
+    if (/^In short:/i.test(text)) return "is-short";
+    if (/^Tip:/i.test(text)) return "is-tip";
+    if (/^•\s/.test(text)) return "is-bullet";
+    if (/^–\s/.test(text)) return "is-sub";
+    if (/^\d+\.\s/.test(text)) return "is-step";
+    if (/^\*\*[^*]+\*\*$/.test(text.trim())) return "is-heading";
+    return "";
+  }
+
+  function renderParagraph(p, text) {
+    const kind = paragraphKind(text);
+    p.className = "block-paragraph" + (kind ? " " + kind : "");
+    const lead = (kind === "is-short" || kind === "is-tip") ? /^(In short:|Tip:)\s*/i.exec(text) : null;
+    if (!lead) {
+      renderRichText(p, text);
+      return;
+    }
+    renderRichText(p, text.slice(lead[0].length));
+    const strong = document.createElement("span");
+    strong.className = "lead";
+    strong.textContent = lead[0];
+    p.insertBefore(strong, p.firstChild);
+    p._renderedText = p.textContent;
+  }
+
   // Appends text, turning **bold** runs into <strong> and xrefs into links.
   function appendInline(parent, text) {
     const parts = text.split(/\*\*([^*]+)\*\*/);
@@ -3058,7 +3186,7 @@ window.COJOINZ_DATA = {
         const tr = document.createElement("tr");
         r.forEach((c, i) => {
           const td = document.createElement("td");
-          td.textContent = c;
+          renderRichText(td, c); // "[see 3.5.2.2]" etc. become links here too
           if (colClasses[i]) td.className = colClasses[i];
           tr.appendChild(td);
         });
@@ -3070,11 +3198,11 @@ window.COJOINZ_DATA = {
     }
     const p = document.createElement("p");
     p.className = "block-paragraph";
-    renderRichText(p, b.text || "");
+    renderParagraph(p, b.text || "");
     makeEditable(p, (val) => {
       b.text = val;
       buildFlatIndex();
-      renderRichText(p, val);
+      renderParagraph(p, val);
     }, { singleLine: false });
     return p;
   }
@@ -3437,9 +3565,8 @@ window.COJOINZ_DATA = {
 
   /* Anchor self-check. Runs on page load AND after every Excel import
      (both call resolveNamedAnchors). Open DevTools console and look for
-     "[INFOZ anchors]". Expected result: "all OK" — except
-     wager-invalid-words, which uses its number until 3.5.2.2.8.1 is
-     retitled "WAGER Invalid Words:". */
+     "[INFOZ anchors]". Expected result: "all OK". (Old WAGER anchors
+     share a title regex with their new section on purpose.) */
   function auditNamedAnchors() {
     const msgs = [];
     NAMED_ANCHORS.forEach((def) => {
