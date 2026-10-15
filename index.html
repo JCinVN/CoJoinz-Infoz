@@ -120,12 +120,40 @@ button { font-family: inherit; }
 .search-input::placeholder { color: var(--text-muted); }
 
 /* Gear button + drop-down column (Advanced panel above the results). */
-.search-input { padding-right: 42px; }
-.search-gear {
+/* Right-hand controls inside the box: ✕ clear, ⚙ Advanced, matches pill.
+   The input's right padding is kept in step with their width by script. */
+.search-controls {
   position: absolute;
   right: 4px;
   top: 50%;
   transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.search-clear {
+  width: 28px;
+  height: 30px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 15px;
+  cursor: pointer;
+}
+.search-clear:hover { color: var(--text-color); background-color: rgba(148,163,184,0.18); }
+.search-clear[hidden], .search-count[hidden] { display: none; }
+.search-count {
+  margin-left: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background-color: #2563eb;
+  color: #FFFF00;
+  font-weight: 800;
+  font-size: 12.5px;
+  white-space: nowrap;
+}
+.search-gear {
   width: 32px;
   height: 30px;
   border: none;
@@ -155,8 +183,22 @@ button { font-family: inherit; }
   font-size: 13px;
 }
 .search-adv[hidden] { display: none; }
-.adv-opts { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-bottom: 10px; }
-.adv-opts label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+.adv-opts { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-bottom: 12px; }
+.adv-opts label { display: inline-flex; align-items: center; gap: 9px; cursor: pointer; font-size: 19.5px; font-weight: 600; }
+.adv-opts input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  border: 2px solid var(--text-muted);
+  border-radius: 4px;
+  background-color: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.adv-opts input[type="checkbox"]:checked { background-color: #16a34a; border-color: #16a34a; }
+.adv-opts input[type="checkbox"]:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .adv-add { display: flex; gap: 6px; margin-bottom: 10px; }
 .adv-add select, .adv-add .adv-term {
   background-color: rgba(15,23,42,0.6);
@@ -682,8 +724,8 @@ body.pane-resizing, body.pane-resizing * { cursor: ew-resize !important; user-se
 
 @media (max-width: 600px) {
   /* The collapsed box is too narrow for the gear: show it once expanded. */
-  .search-wrap:not(:focus-within):not(.adv-open) .search-gear { display: none; }
-  .search-wrap:not(:focus-within):not(.adv-open) .search-input { padding-right: 10px; }
+  .search-wrap:not(:focus-within):not(.adv-open) .search-controls { display: none; }
+  .search-wrap:not(:focus-within):not(.adv-open) .search-input { padding-right: 10px !important; }
   .search-wrap:focus-within, .search-wrap.adv-open {
     position: absolute;
     left: 8px;
@@ -1966,7 +2008,7 @@ window.COJOINZ_DATA = {
                         },
                         {
                           "type": "paragraph",
-                          "text": "• No word lookups are allowed until the Session ends."
+                          "text": "• No word lookups are allowed until the Session ends, unless there is a challenge to a word's validity."
                         }
                       ],
                       "children": []
@@ -1986,7 +2028,7 @@ window.COJOINZ_DATA = {
                         },
                         {
                           "type": "paragraph",
-                          "text": "• The Active Player's WAGER Tokenz is one of their 6."
+                          "text": "• The Active Player's WAGER Tokenz is one of their 6 and is used as their Ante."
                         },
                         {
                           "type": "paragraph",
@@ -2124,7 +2166,7 @@ window.COJOINZ_DATA = {
                         },
                         {
                           "type": "paragraph",
-                          "text": "– Fold: say \"I fold\" and drop out. Your Tokenz in the pot stay there. Keep the rest of your Wager Pool."
+                          "text": "– Fold: say \"I fold\" and drop out without revealing your hand. Your Tokenz in the pot stay there. Keep the rest of your Wager Pool."
                         },
                         {
                           "type": "paragraph",
@@ -2136,7 +2178,7 @@ window.COJOINZ_DATA = {
                         },
                         {
                           "type": "paragraph",
-                          "text": "• The round ends when every Player still in has matched the highest bet."
+                          "text": "• The round ends when every Player who is still \"alive\" has matched the highest bet (the \"Price\")."
                         },
                         {
                           "type": "paragraph",
@@ -2849,6 +2891,8 @@ window.COJOINZ_DATA = {
   let activeIndex = -1;      // keyboard-selected search result
   let currentResults = [];
   let searchAdvEl = null;    // Advanced search panel
+  let searchControlsEl = null; // ✕ / ⚙ / matches pill inside the box
+  let searchCountEl = null;
   let hitMarks = [];         // on-page highlights from the last search jump
   let hitIndex = 0;
   let hitNavEl = null;       // "2 of 5" stepper
@@ -3734,7 +3778,7 @@ window.COJOINZ_DATA = {
      Query syntax (plain search syntax, not RegEx):
        words           all must appear (AND is the default)
        "exact phrase"  straight or curly quotes
-       OR, AND, NOT    upper-case operators; -word is short for NOT word
+       OR, AND, NOT    upper-case operators; + is AND, -word is NOT word
        ( )             grouping
        * / ?           any letters / exactly one letter, within a word
      Words match from the start of a word ("tile" finds "tiles", "new" does
@@ -3782,6 +3826,8 @@ window.COJOINZ_DATA = {
       let word = q.slice(i, j);
       i = j;
       if (word === "AND" || word === "OR" || word === "NOT") { toks.push({ t: word }); continue; }
+      if (word === "+") { toks.push({ t: "AND" }); continue; }
+      if (word[0] === "+") word = word.slice(1); // +word = must contain word (same as AND)
       if (word[0] === "-") {
         toks.push({ t: "NOT" });
         word = word.slice(1);
@@ -3929,7 +3975,9 @@ window.COJOINZ_DATA = {
       if (score > 0) results.push({ entry, score, order });
     });
     results.sort((a, b) => b.score - a.score || a.order - b.order);
-    return results.slice(0, limit).map((r) => r.entry);
+    const list = results.slice(0, limit).map((r) => r.entry);
+    list.total = results.length; // full count, for the matches pill
+    return list;
   }
 
   function highlightHTML(text, cq) {
@@ -4088,7 +4136,32 @@ window.COJOINZ_DATA = {
     gear.title = "Advanced search";
     gear.setAttribute("aria-label", "Advanced search");
     gear.textContent = "⚙";
-    el.searchInput.insertAdjacentElement("afterend", gear);
+
+    const clearBtn = document.createElement("button");
+    clearBtn.type = "button";
+    clearBtn.className = "search-clear";
+    clearBtn.title = "Clear search";
+    clearBtn.setAttribute("aria-label", "Clear search");
+    clearBtn.textContent = "✕";
+    clearBtn.hidden = true;
+
+    searchCountEl = document.createElement("span");
+    searchCountEl.className = "search-count";
+    searchCountEl.setAttribute("aria-live", "polite");
+    searchCountEl.hidden = true;
+
+    const controls = document.createElement("div");
+    controls.className = "search-controls";
+    controls.append(clearBtn, gear, searchCountEl);
+    el.searchInput.insertAdjacentElement("afterend", controls);
+    searchControlsEl = controls;
+    syncSearchPadding();
+
+    clearBtn.addEventListener("click", () => {
+      el.searchInput.value = "";
+      onSearchInput();
+      el.searchInput.focus();
+    });
 
     // Drop-down column: Advanced panel above the results.
     const drop = document.createElement("div");
@@ -4102,12 +4175,12 @@ window.COJOINZ_DATA = {
       '<label><input type="checkbox" data-opt="wholeWord"> Whole word</label>' +
       "</div>" +
       '<div class="adv-add">' +
-      '<select aria-label="How to combine"><option>AND</option><option>OR</option><option>NOT</option></select>' +
+      '<select aria-label="How to combine"><option value="AND">AND (+)</option><option value="OR">OR</option><option value="NOT">NOT (-)</option></select>' +
       '<input type="text" class="adv-term" placeholder="another word or phrase" autocomplete="off" spellcheck="false">' +
       '<button type="button" class="btn adv-add-btn">Add</button>' +
       "</div>" +
       '<div class="adv-help">' +
-      '<b>"exact phrase"</b> · <b>OR</b> · <b>AND</b> (default) · <b>NOT</b> word or <b>-</b>word · ' +
+      '<b>"exact phrase"</b> · <b>AND</b> or <b>+</b> (default) · <b>OR</b> · <b>NOT</b> word or <b>-</b>word · ' +
       '<b>( )</b> group · <b>*</b> any letters · <b>?</b> one letter' +
       "</div>";
     drop.appendChild(searchAdvEl);
@@ -4150,7 +4223,9 @@ window.COJOINZ_DATA = {
     el.searchInput.addEventListener("keydown", onSearchKeydown);
     el.searchInput.addEventListener("focus", () => {
       if (el.searchInput.value.trim()) el.searchResults.hidden = false;
+      requestAnimationFrame(syncSearchPadding); // phones: controls appear on focus
     });
+    window.addEventListener("resize", syncSearchPadding);
     document.addEventListener("click", (e) => {
       if (!e.target.closest(".search-wrap")) closeSearchDrop();
     });
@@ -4171,13 +4246,31 @@ window.COJOINZ_DATA = {
   function onSearchInput() {
     const q = el.searchInput.value.trim();
     activeIndex = -1;
+    const clearBtn = searchControlsEl && searchControlsEl.querySelector(".search-clear");
+    if (clearBtn) clearBtn.hidden = !el.searchInput.value;
     if (!q) {
       el.searchResults.hidden = true;
       el.searchResults.innerHTML = "";
+      setMatchCount(null);
       return;
     }
     currentResults = search(q, 30);
+    setMatchCount(currentResults.total);
     renderSearchResults(currentResults, q);
+  }
+
+  // "12 matches" pill at the right of the search box (hidden when empty).
+  function setMatchCount(n) {
+    if (!searchCountEl) return;
+    searchCountEl.hidden = n === null;
+    if (n !== null) searchCountEl.textContent = n + (n === 1 ? " match" : " matches");
+    syncSearchPadding();
+  }
+
+  // Keeps typed text clear of the controls on the right of the box.
+  function syncSearchPadding() {
+    if (!searchControlsEl) return;
+    el.searchInput.style.paddingRight = (searchControlsEl.offsetWidth + 12) + "px";
   }
 
   function onSearchKeydown(e) {
@@ -4258,6 +4351,13 @@ window.COJOINZ_DATA = {
       btn.addEventListener("click", () => selectResult(entry, query));
       el.searchResults.appendChild(btn);
     });
+
+    if (results.total > results.length) {
+      const more = document.createElement("div");
+      more.className = "search-empty";
+      more.textContent = `Showing the best ${results.length} of ${results.total} — add words to narrow it down.`;
+      el.searchResults.appendChild(more);
+    }
   }
 
   // "Earning Tokenz" from "Earning Tokenz: …"; long sentence titles are cut.
