@@ -467,13 +467,15 @@ a.xref:hover { color: #4ade80; }
 /* Layered rule text (set by the paragraph's opening characters, so it
    survives Excel export/import):
      "In short: …"  summary line      "• …"  bullet      "– …"  sub-bullet
-     "1. …"         numbered step     "Tip: …"  tip */
+     "1. …"         numbered step     "Tip: …"  tip     "Note: …"  boxed note */
 .block-paragraph.is-short { border-left: 3px solid var(--accent-glow); padding-left: 12px; color: var(--text-color); }
 .block-paragraph.is-short .lead, .block-paragraph.is-tip .lead { font-weight: 700; }
 .block-paragraph.is-bullet, .block-paragraph.is-step, .block-paragraph.is-sub { margin-bottom: 4px; padding-left: 20px; text-indent: -14px; }
 .block-paragraph.is-sub { padding-left: 40px; }
 .block-paragraph.is-step { padding-left: 24px; text-indent: -18px; }
 .block-paragraph.is-tip { font-style: italic; color: var(--text-muted); margin-top: 12px; }
+.block-paragraph.is-note { border: 1px dashed var(--text-muted); border-radius: 8px; padding: 8px 12px; margin-top: 12px; }
+.block-paragraph.is-note .lead { display: none; } /* the box itself says "note" */
 .block-paragraph.is-heading { margin: 14px 0 6px; }
 
 .children-wrap { margin-top: 8px; display: flex; flex-direction: column; gap: 10px; }
@@ -2545,7 +2547,7 @@ window.COJOINZ_DATA = {
                 "Earned by",
                 "When",
                 "Award",
-                "Who receives it",
+                "Who gets it",
                 "T-PAIR Share?"
               ],
               "rows": [
@@ -2571,6 +2573,13 @@ window.COJOINZ_DATA = {
                   "Yes"
                 ],
                 [
+                  "JOINZ 5",
+                  "You form or modify 5 intersecting words in one turn",
+                  "3 T-PAIRs",
+                  "Active Player",
+                  "Yes"
+                ],
+                [
                   "PERFECT TURN",
                   "You play all of your baseline Letter Tiles in one turn",
                   "1 T-PAIR",
@@ -2586,7 +2595,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "WILD 15",
-                  "You use one or more Wild Letter Tiles and the word scores 15+ points",
+                  "You use one or more Wild Letter Tiles and the word scores 15+ points before Bonus Tokenz",
                   "1 T-PAIR",
                   "Active Player",
                   "Yes"
@@ -2616,7 +2625,14 @@ window.COJOINZ_DATA = {
                   "STEAL / GIVE BONUS",
                   "A STEAL 1 BONUS, STEAL 3 BONUS(es) or GIVE BONUS(es) Action Tokenz",
                   "The Bonus Tokenz only",
-                  "The Player who receives the Bonus Tokenz",
+                  "Active Player (STEAL) or Target (GIVE)",
+                  "No"
+                ],
+                [
+                  "NEW T-PAIR",
+                  "You play a NEW T-PAIR Action Tokenz",
+                  "1 T-PAIR",
+                  "Active Player",
                   "No"
                 ],
                 [
@@ -2627,6 +2643,22 @@ window.COJOINZ_DATA = {
                   "No"
                 ]
               ]
+            },
+            {
+              "type": "paragraph",
+              "text": "• Triggers add up: every trigger you meet in one turn earns its T-PAIRs."
+            },
+            {
+              "type": "paragraph",
+              "text": "• JOINZ counts only your finished Grid Play, and each JOINZ award is a total: a JOINZ 4 earns 2 T-PAIRs in all, not JOINZ 3 + JOINZ 4."
+            },
+            {
+              "type": "paragraph",
+              "text": "• You don't need to add anything up: Scorz works out the T-PAIRs earned each turn, and the Scorekeeper announces them."
+            },
+            {
+              "type": "paragraph",
+              "text": "Note: **Not earned: borrowed T-PAIRs.** In a WAGER Session, a Player with fewer than 6 Tokenz borrows T-PAIRs from the bank. These must be paid back [see 4.9.3]."
             }
           ],
           "children": []
@@ -3384,6 +3416,7 @@ window.COJOINZ_DATA = {
   function paragraphKind(text) {
     if (/^In short:/i.test(text)) return "is-short";
     if (/^Tip:/i.test(text)) return "is-tip";
+    if (/^Note:/i.test(text)) return "is-note";
     if (/^•\s/.test(text)) return "is-bullet";
     if (/^–\s/.test(text)) return "is-sub";
     if (/^\d+\.\s/.test(text)) return "is-step";
@@ -3394,7 +3427,8 @@ window.COJOINZ_DATA = {
   function renderParagraph(p, text) {
     const kind = paragraphKind(text);
     p.className = "block-paragraph" + (kind ? " " + kind : "");
-    const lead = (kind === "is-short" || kind === "is-tip") ? /^(In short:|Tip:)\s*/i.exec(text) : null;
+    const lead = kind === "is-note" ? /^Note:\s*/i.exec(text)
+      : (kind === "is-short" || kind === "is-tip") ? /^(In short:|Tip:)\s*/i.exec(text) : null;
     if (!lead) {
       renderRichText(p, text);
       return;
