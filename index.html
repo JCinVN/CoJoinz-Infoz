@@ -296,7 +296,11 @@ table.block-table tr.row-hit td:first-child { box-shadow: inset 4px 0 0 var(--go
   cursor: pointer;
 }
 .hit-nav button:hover { background-color: rgba(0,0,0,0.12); }
-.hit-count { padding: 0 6px; white-space: nowrap; }
+.hit-count { padding: 0 6px; white-space: nowrap; min-width: 7.5em; text-align: center; }
+.hit-mode { display: inline-flex; background-color: rgba(0,0,0,0.12); border-radius: 999px; padding: 2px; margin-right: 2px; }
+.hit-nav .hit-mode button { width: auto; height: 26px; padding: 0 10px; font-size: 12.5px; }
+.hit-nav .hit-mode button.on { background-color: #1a1a1a; color: var(--gold); }
+.hit-nav .hit-mode button:disabled { opacity: .4; cursor: default; }
 
 /* ---------- Layout ---------- */
 .layout { flex: 1; display: flex; min-height: 0; }
@@ -2895,7 +2899,13 @@ window.COJOINZ_DATA = {
   let searchCountEl = null;
   let hitMarks = [];         // on-page highlights from the last search jump
   let hitIndex = 0;
-  let hitNavEl = null;       // "2 of 5" stepper
+  let hitNavEl = null;       // yellow stepper pill
+  // Stepper state for the current search (null when none):
+  //   results mode: ▲▼ walk the ranked results (sections and table rows)
+  //   words mode:   ▲▼ walk every single occurrence, in page order
+  let stepState = null;
+  const STEP_MODE_KEY = "cojoinz-infoz-step-mode";
+  let stepMode = "results";
 
   const el = {
     docHeader: document.getElementById("docHeader"),
@@ -3542,6 +3552,10 @@ window.COJOINZ_DATA = {
     setActiveSection(id);
 
     clearSearchHighlight();
+    if (!query && stepState) { // TOC / link / Back: leave search stepping
+      stepState = null;
+      updateHitNav();
+    }
     let matchEl = null;
     if (query && query.trim()) {
       matchEl = highlightHits(target, query.trim(), opts);
@@ -3678,6 +3692,8 @@ window.COJOINZ_DATA = {
     window.addEventListener("popstate", (e) => {
       const st = e.state;
       if (!st || !st.infoz) return; // a typed/linked hash: hashchange handles it
+      clearSearchHighlight();
+      stepState = null;
       if (st.pos) restorePosition(st.pos, st.active);
       else if (st.target) goToSection(st.target, false);
       updateBackButton();
@@ -4072,9 +4088,20 @@ window.COJOINZ_DATA = {
 
   function updateHitNav() {
     if (!hitNavEl) return;
-    const live = hitMarks.length > 0;
-    hitNavEl.hidden = !live;
-    if (live) hitNavEl.querySelector(".hit-count").textContent = (hitIndex + 1) + " of " + hitMarks.length;
+    const st = stepState;
+    hitNavEl.hidden = !st;
+    if (!st) return;
+    hitNavEl.querySelectorAll(".hit-mode button").forEach((b) => b.classList.toggle("on", b.dataset.mode === stepMode));
+    const wordsBtn = hitNavEl.querySelector('.hit-mode button[data-mode="words"]');
+    wordsBtn.disabled = !st.units.length;
+    let text;
+    if (stepMode === "words" && st.units.length) {
+      const pos = (st.offsets[st.unitIdx] || 0) + Math.min(hitIndex, Math.max(0, hitMarks.length - 1)) + 1;
+      text = "Word " + pos + " of " + st.total;
+    } else {
+      text = "Result " + (st.resultIdx + 1) + " of " + st.results.length;
+    }
+    hitNavEl.querySelector(".hit-count").textContent = text;
   }
 
   function wireHitNav() {
@@ -4082,14 +4109,191 @@ window.COJOINZ_DATA = {
     hitNavEl.className = "hit-nav";
     hitNavEl.hidden = true;
     hitNavEl.innerHTML =
-      '<button type="button" class="hit-prev" aria-label="Previous match">▲</button>' +
+      '<span class="hit-mode" role="group" aria-label="Step through">' +
+      '<button type="button" data-mode="results" title="Step through results (sections and table rows), best first">Results</button>' +
+      '<button type="button" data-mode="words" title="Step through every single word, top to bottom">Words</button>' +
+      "</span>" +
+      '<button type="button" class="hit-prev" aria-label="Previous">▲</button>' +
       '<span class="hit-count"></span>' +
-      '<button type="button" class="hit-next" aria-label="Next match">▼</button>' +
-      '<button type="button" class="hit-close" aria-label="Clear highlights">✕</button>';
+      '<button type="button" class="hit-next" aria-label="Next">▼</button>' +
+      '<button type="button" class="hit-close" aria-label="Clear search highlights">✕</button>';
     document.body.appendChild(hitNavEl);
-    hitNavEl.querySelector(".hit-prev").addEventListener("click", () => setCurrentHit(hitIndex - 1, true));
-    hitNavEl.querySelector(".hit-next").addEventListener("click", () => setCurrentHit(hitIndex + 1, true));
-    hitNavEl.querySelector(".hit-close").addEventListener("click", clearSearchHighlight);
+    try {
+      if (localStorage.getItem(STEP_MODE_KEY) === "words") stepMode = "words";
+    } catch (e) { /* storage unavailable: results mode */ }
+    hitNavEl.querySelectorAll(".hit-mode button").forEach((b) => b.addEventListener("click", () => setStepMode(b.dataset.mode)));
+    hitNavEl.querySelector(".hit-prev").addEventListener("click", () => step(-1));
+    hitNavEl.querySelector(".hit-next").addEventListener("click", () => step(1));
+    hitNavEl.querySelector(".hit-close").addEventListener("click", () => {
+      // Stop stepping; the section being read stays open.
+      clearSearchHighlight();
+      stepState = null;
+      updateHitNav();
+    });
+  }
+
+  /* ---------------- Stepping through a search ---------------- */
+
+  // Units for words mode: every section (in page order) whose heading,
+  // text or table matches the search, with how many words it highlights.
+  function buildStepUnits(st) {
+    st.units = [];
+    st.offsets = [];
+    st.total = 0;
+    if (!st.cq || !st.cq.positives.length) return;
+    FLAT_INDEX.forEach((entry, order) => {
+      const node = entry.node;
+      const tables = (node.blocks || []).filter((b) => b.type === "table");
+      const hayOk = evalQuery(st.cq.ast, entry.title + "\n" + (entry.paragraphText || "")) ||
+        tables.some((b) => (b.rows || []).some((r) => evalQuery(st.cq.ast, r.join("\n"))));
+      if (!hayOk) return;
+      const pieces = [entry.title];
+      (node.blocks || []).forEach((b) => {
+        if (b.type === "table") {
+          if (b.caption) pieces.push(b.caption);
+          (b.headers || []).forEach((h) => pieces.push(String(h)));
+          (b.rows || []).forEach((r) => r.forEach((c) => pieces.push(String(c))));
+        } else {
+          pieces.push(String(b.text || "").replace(/\*\*/g, ""));
+        }
+      });
+      const count = pieces.reduce((n, t) => n + matchRanges(t, st.cq).length, 0);
+      if (!count) return;
+      st.offsets.push(st.total);
+      st.units.push({ id: entry.id, count: count, order: order });
+      st.total += count;
+    });
+  }
+
+  function recountOffsets(st) {
+    st.total = 0;
+    st.offsets = st.units.map((u) => { const o = st.total; st.total += u.count; return o; });
+  }
+
+  function unitIndexOf(st, id) {
+    return st.units.findIndex((u) => u.id === id);
+  }
+
+  // Sections the stepper opened only to show a word; re-closed when it
+  // moves on (words mode). Sections opened by the reader are left alone.
+  // Returns the ones kept open because they hold keepCard.
+  function collapseAutoOpened(keepCard) {
+    const st = stepState;
+    if (!st || !st.autoOpened) return [];
+    const kept = [];
+    st.autoOpened.forEach((card) => {
+      if (keepCard && (card === keepCard || card.contains(keepCard))) {
+        kept.push(card);
+        return;
+      }
+      const body = card.querySelector(":scope > .section-body");
+      const caret = card.querySelector(":scope > .section-head > .section-caret");
+      if (body && caret) {
+        body.classList.remove("open");
+        caret.classList.remove("open");
+      }
+    });
+    st.autoOpened = [];
+    return kept;
+  }
+
+  function closedChain(card) {
+    const out = [];
+    let node = card;
+    while (node) {
+      const body = node.querySelector(":scope > .section-body");
+      if (body && !body.classList.contains("open")) out.push(node);
+      node = node.parentElement ? node.parentElement.closest(".section-card") : null;
+    }
+    return out;
+  }
+
+  // Keep the Back history pointing at where the stepper now is.
+  function replaceStepHistory(id) {
+    const cur = history.state && history.state.infoz ? history.state : null;
+    if (!cur) return;
+    const named = (SECTION_TO_ANCHORS[id] || [])[0];
+    history.replaceState(Object.assign({}, cur, { target: id, pos: null }), "", "#" + (named || id));
+  }
+
+  function goToResult(i) {
+    const st = stepState;
+    const n = st.results.length;
+    if (!n) return;
+    st.resultIdx = (i + n) % n;
+    const entry = st.results[st.resultIdx];
+    const rowOpts = entry.kind === "row" ? { rowBlock: entry.blockIndex, rowIndex: entry.rowIndex } : null;
+    goToSection(entry.id, false, st.query, rowOpts);
+    replaceStepHistory(entry.id);
+    const u = unitIndexOf(st, entry.id);
+    if (u >= 0) st.unitIdx = u;
+    updateHitNav();
+  }
+
+  function goToUnit(u, atEnd) {
+    const st = stepState;
+    const n = st.units.length;
+    if (!n) return;
+    st.unitIdx = (u + n) % n;
+    const unit = st.units[st.unitIdx];
+    const card = findSectionCard(unit.id);
+    if (!card) return;
+    const kept = collapseAutoOpened(card);
+    st.autoOpened = kept.concat(closedChain(card));
+    goToSection(unit.id, false, st.query);
+    replaceStepHistory(unit.id);
+    if (hitMarks.length && hitMarks.length !== unit.count) {
+      unit.count = hitMarks.length; // keep the "Word n of N" count exact
+      recountOffsets(st);
+    }
+    if (atEnd && hitMarks.length) setCurrentHit(hitMarks.length - 1, true);
+    const r = st.results.findIndex((e) => e.id === unit.id);
+    if (r >= 0) st.resultIdx = r;
+    updateHitNav();
+  }
+
+  function step(dir) {
+    const st = stepState;
+    if (!st) return;
+    if (stepMode === "words" && st.units.length) {
+      const next = hitIndex + dir;
+      if (hitMarks.length && next >= 0 && next < hitMarks.length) {
+        setCurrentHit(next, true);
+        return;
+      }
+      goToUnit(st.unitIdx + dir, dir < 0);
+    } else {
+      goToResult(st.resultIdx + dir);
+    }
+  }
+
+  function setStepMode(mode) {
+    if (mode === stepMode) return;
+    if (mode === "words" && (!stepState || !stepState.units.length)) return;
+    stepMode = mode;
+    try { localStorage.setItem(STEP_MODE_KEY, mode); } catch (e) { /* not remembered */ }
+    const st = stepState;
+    if (st) {
+      const curId = activeSectionId();
+      if (mode === "words") {
+        const u = unitIndexOf(st, curId);
+        if (u >= 0) st.unitIdx = u;
+        st.autoOpened = [];
+      } else {
+        const r = st.results.findIndex((e) => e.id === curId);
+        if (r >= 0) st.resultIdx = r;
+      }
+    }
+    updateHitNav();
+  }
+
+  // Words mode starts at the first matching section at or after the one
+  // at the top of the screen (like a browser's Find), wrapping round.
+  function firstUnitFromHere(st) {
+    const pos = capturePosition();
+    const hereOrder = pos && pos.id ? FLAT_INDEX.findIndex((e) => e.id === pos.id) : 0;
+    const u = st.units.findIndex((x) => x.order >= hereOrder);
+    return u >= 0 ? u : 0;
   }
 
   // True when `node` sits inside a .children-wrap that is itself inside
@@ -4147,6 +4351,7 @@ window.COJOINZ_DATA = {
 
     searchCountEl = document.createElement("span");
     searchCountEl.className = "search-count";
+    searchCountEl.title = "Sections and table rows that match your search";
     searchCountEl.setAttribute("aria-live", "polite");
     searchCountEl.hidden = true;
 
@@ -4259,11 +4464,12 @@ window.COJOINZ_DATA = {
     renderSearchResults(currentResults, q);
   }
 
-  // "12 matches" pill at the right of the search box (hidden when empty).
+  // "12 results" pill at the right of the search box (hidden when empty):
+  // how many sections / table rows match, not how many words.
   function setMatchCount(n) {
     if (!searchCountEl) return;
     searchCountEl.hidden = n === null;
-    if (n !== null) searchCountEl.textContent = n + (n === 1 ? " match" : " matches");
+    if (n !== null) searchCountEl.textContent = n + (n === 1 ? " result" : " results");
     syncSearchPadding();
   }
 
@@ -4294,7 +4500,7 @@ window.COJOINZ_DATA = {
       if (activeIndex >= 0 && currentResults[activeIndex]) {
         selectResult(currentResults[activeIndex], q);
       } else if (currentResults.length) {
-        selectResult(currentResults[0], q);
+        selectResult(currentResults[0], q, true);
       }
     }
   }
@@ -4372,12 +4578,42 @@ window.COJOINZ_DATA = {
     return (titles.length > 2 ? "… › " : "") + tail.join(" › ");
   }
 
-  function selectResult(entry, query) {
+  // viaEnter: Enter pressed without picking a particular result. In words
+  // mode that starts at the first match from the current position.
+  function selectResult(entry, query, viaEnter) {
     closeSearchDrop();
     el.searchInput.value = "";
     el.searchInput.blur();
-    const rowOpts = entry.kind === "row" ? { rowBlock: entry.blockIndex, rowIndex: entry.rowIndex } : null;
-    navigateTo(entry.id, query, null, rowOpts);
+    onSearchInput(); // hides ✕ and the results pill now the box is empty
+    collapseAutoOpened(null);
+    const st = {
+      query: query,
+      cq: compileQuery(query, searchOpts),
+      results: search(query, Infinity),
+      resultIdx: 0,
+      unitIdx: 0,
+      autoOpened: [],
+    };
+    buildStepUnits(st);
+    st.resultIdx = Math.max(0, st.results.indexOf(entry));
+    const wordsStart = stepMode === "words" && viaEnter && st.units.length;
+    const startUnit = wordsStart ? firstUnitFromHere(st) : -1;
+    stepState = st;
+    if (wordsStart) {
+      const unit = st.units[startUnit];
+      st.unitIdx = startUnit;
+      const card = findSectionCard(unit.id);
+      st.autoOpened = card ? closedChain(card) : [];
+      navigateTo(unit.id, query);
+      const r = st.results.findIndex((e) => e.id === unit.id);
+      if (r >= 0) st.resultIdx = r;
+    } else {
+      const u = unitIndexOf(st, entry.id);
+      if (u >= 0) st.unitIdx = u;
+      const rowOpts = entry.kind === "row" ? { rowBlock: entry.blockIndex, rowIndex: entry.rowIndex } : null;
+      navigateTo(entry.id, query, null, rowOpts);
+    }
+    updateHitNav();
     closeSidebarOnMobile();
   }
 
