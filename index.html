@@ -1174,7 +1174,47 @@ window.COJOINZ_DATA = {
           "blocks": [
             {
               "type": "paragraph",
-              "text": "CoJoinz Letterz has two types of Tokenz that each affect gameplay very differently and make CoJoinz Letterz a uniquely exciting game. The individual Player's use of Tokenz is purely optional, and when Tokenz are played, the typical gameplay flow is: Action Tokenz -> Grid Play (word-building with Letter Tiles) -> Bonus Tokenz; however, both Tokenz types do not need to be played together in the same turn, and some special Tokenz may only be played outside of a Player's turn."
+              "text": "In short: Tokenz add actions and bonus points to the game. There are two types: Action Tokenz and Bonus Tokenz."
+            },
+            {
+              "type": "table",
+              "caption": "",
+              "headers": [
+                "Type",
+                "When you play it",
+                "What it does",
+                "How many"
+              ],
+              "rows": [
+                [
+                  "Action Tokenz",
+                  "Before your Grid Play (Anytime ones: during another Player's turn)",
+                  "Changes the game: steal, block, swap, start a Special Session, and more",
+                  "38 kinds, 156 in all"
+                ],
+                [
+                  "Bonus Tokenz",
+                  "After your first tally",
+                  "Adds points to your turn",
+                  "17 kinds, 68 in all"
+                ]
+              ]
+            },
+            {
+              "type": "paragraph",
+              "text": "• Playing Tokenz is always optional, and you don't have to play both types in the same turn."
+            },
+            {
+              "type": "paragraph",
+              "text": "• Tokenz-free and Freeplay games use no Tokenz. Bonus-Lite uses only Bonus Tokenz; Action-Lite uses only Action Tokenz [see 2.2]."
+            },
+            {
+              "type": "paragraph",
+              "text": "• You get Tokenz mainly by earning T-PAIRs [see 3.4]."
+            },
+            {
+              "type": "paragraph",
+              "text": "• Tokenz still in your hand at the end of the game cost Hand Points [see 6.3]."
             }
           ],
           "children": []
@@ -1186,11 +1226,15 @@ window.COJOINZ_DATA = {
           "blocks": [
             {
               "type": "paragraph",
-              "text": "Action Tokenz are the “secret sauce” to CoJoinz Letterz by offering nearly 40 distinct interactive actions that dramatically change the gameplay from its classic word-building roots. Standard Action Tokenz are used before Letter Tiles are played in Grid Play. There is also a special group of seven Action Tokenz (collectively called \"Anytime\" Action Tokenz) that Players may choose to play at any time outside their turn."
+              "text": "In short: All 38 Action Tokenz. Play one per turn, before your Grid Play [see 4.7]. The seven marked Anytime are played during another Player's turn [see 4.7.1]."
+            },
+            {
+              "type": "paragraph",
+              "text": "• Every Action Tokenz has 0 Play Points and 10 Hand Points."
             },
             {
               "type": "table",
-              "caption": "ACTION Tokenz - Full List (with Functions, Play Points, and Hand Points):",
+              "caption": "All 38 Action Tokenz",
               "headers": [
                 "ACTION TOKENZ\nNAME",
                 "GAMEPLAY\nTYPE",
@@ -1204,16 +1248,16 @@ window.COJOINZ_DATA = {
                 [
                   "AXIS LOCK",
                   "Standard",
-                  "All new Letter Tiles for one round must be placed along the single axis (either X or Y) chosen by the Active Player, starting with the Active Player’s turn and lasting for one complete round; this Action Tokenz is returned to the issuing Player's Action Tokenz discard pile after expiration (completion of the entire round).",
+                  "For one full round, starting with your turn, all new Letter Tiles must be placed along one axis (X or Y) that you choose. Then this Tokenz goes to your discard pile.",
                   "0",
                   "10",
                   "1",
                   "4"
                 ],
                 [
-                  "BACK ATCHU **",
+                  "BACK ATCHU",
                   "Anytime",
-                  "(**Anytime)  When any Player targets you with an adverse Action Tokenz (such as a \"BLOCK\", “BURN”, “SKIP”, or “STEAL Bonus”), BACK ATCHU flips the effect back onto that Player while protecting you from that action. Unlike standard Action Tokenz, the issuing Player may play a \"BACK ATCHU\" Action Tokenz anytime (without waiting for their turn) during any Target's turn.",
+                  "When a Player targets you with a harmful Action Tokenz (such as BLOCK, BURN, SKIP TURN or STEAL … BONUS), turn it back on them: you are protected, and they get the effect instead. Play it when you are targeted.",
                   "0",
                   "10",
                   "1",
@@ -1222,34 +1266,34 @@ window.COJOINZ_DATA = {
                 [
                   "BLAST",
                   "Standard",
-                  "aka: \"TOTAL RESET\": Totally wipes the Grid clean of Letter Tiles. Before advancing to the next Player's turn, Players vote to either discard all blasted Letter Tiles or to shuffle them into the Letter Tile draw pile. [Scorekeeper breaks ties]",
+                  "\"TOTAL RESET\": clears every Letter Tile off the Grid. Before the next turn, Players vote to discard the cleared Letter Tiles or shuffle them into the draw pile. The Scorekeeper breaks ties.",
                   "0",
                   "10",
                   "1",
                   "2"
                 ],
                 [
-                  "BLOCK **",
+                  "BLOCK",
                   "Anytime",
-                  "(**Anytime)  Permits the Active Player to block one finished Grid Word of any Target, who must then attempt a second Grid Word or Pass/Exchange for their turn. Unlike standard Action Tokenz, the issuing Player may play this Action Tokenz anytime (without waiting for their turn) during any Target's turn. This Action Tokenz may be reversed (unblocked, in this case) via the use of a \"Back Atchu\" Action Tokenz (but not a \"HEAL\" Action Tokenz, as these are limited to \"BURN\" Action Tokenz).",
+                  "Blocks one finished Grid Word just played by the Target. They must try another Grid Word, or Exchange or Pass. Play it during the Target's turn. Can be reversed by BACK ATCHU (not by HEAL, which only undoes BURN).",
                   "0",
                   "10",
                   "1",
                   "4"
                 ],
                 [
-                  "BONUS FAVOR **",
+                  "BONUS FAVOR",
                   "Anytime",
-                  "(**Anytime)  Permits the Active Player to choose any of their Bonus Tokenz as a \"gift\"/favor for any Target whose final points tally did not include a Bonus Tokenz of their own. The Target's points are immediately re-tallied to include the effect of the Bonus Tokenz (the Bonus may not be refused). Unlike standard Action Tokenz, the issuing Player may play this Action Tokenz anytime (without waiting for their turn) at the end of any qualifying Target's turn.",
+                  "Give one of your Bonus Tokenz as a gift to a Target whose final tally included no Bonus Tokenz. Their points are re-tallied with it at once, and they may not refuse it. Play it at the end of their turn.",
                   "0",
                   "10",
                   "1",
                   "4"
                 ],
                 [
-                  "BURN **",
+                  "BURN",
                   "Anytime",
-                  "(**Anytime)  Converts the Target’s total turn point value (including Bonus Tokenz and PERFECT TURN boosts) into deducted points. Unlike standard Action Tokenz, the issuing Player may play this Action Tokenz anytime (without waiting for their turn) on any Target who just completed their turn and tallied their score (before the next Player begins their turn).",
+                  "Turns the Target's whole score for their turn (including Bonus Tokenz and any Perfect Turn boost) into minus points. Play it just after they tally, before the next Player starts.",
                   "0",
                   "10",
                   "1",
@@ -1258,7 +1302,7 @@ window.COJOINZ_DATA = {
                 [
                   "CHANGE 2 WILDs",
                   "Standard",
-                  "Active Player may move one Wild Letter Tile for another on the Grid, subject to the word validity rule.",
+                  "Swap the places of two Wild Letter Tiles on the Grid. Every word must stay valid.",
                   "0",
                   "10",
                   "1",
@@ -1267,7 +1311,7 @@ window.COJOINZ_DATA = {
                 [
                   "COPY CAT",
                   "Standard",
-                  "The Active Player copies the exact Action Tokenz played by the most recent player in rotation (as shown in their Action Tokenz discard pile adjacent to their Game Rack), and resolves it immediately.",
+                  "Copy the Action Tokenz the previous Player played most recently (the top of their discard pile) and use it at once.",
                   "0",
                   "10",
                   "1",
@@ -1276,7 +1320,7 @@ window.COJOINZ_DATA = {
                 [
                   "GIVE ACTION(s)",
                   "Standard",
-                  "Active Player chooses which Target(s) receive any 1-3 Action Tokenz(s) that are blindly chosen by the Target.",
+                  "Give 1–3 of your Action Tokenz to one or more Targets. Each Target picks which of your Tokenz they get, without looking.",
                   "0",
                   "10",
                   "1",
@@ -1285,7 +1329,7 @@ window.COJOINZ_DATA = {
                 [
                   "GIVE BONUS(es)",
                   "Standard",
-                  "Active Player chooses which Target(s) receive any 1-3 Bonus Tokenz(s) that are blindly chosen by the Target.",
+                  "Give 1–3 of your Bonus Tokenz to one or more Targets. Each Target picks which of your Tokenz they get, without looking.",
                   "0",
                   "10",
                   "1",
@@ -1294,34 +1338,34 @@ window.COJOINZ_DATA = {
                 [
                   "GO AGAIN",
                   "Standard",
-                  "Active Player takes a complete second turn immediately after refreshing their hand from their first turn.",
+                  "After your turn and refilling your hand, take a whole second turn.",
                   "0",
                   "10",
                   "1",
                   "4"
                 ],
                 [
-                  "HEAL **",
+                  "HEAL",
                   "Anytime",
-                  "(**Anytime)  Undoes ('heals') the action of a “BURN” Action Tokenz that has been played on the Target. Unlike standard Action Tokenz, the issuing Player may play this Action Tokenz anytime (without waiting for their turn) on any Target who just received a \"BURN\" Action Tokenz.",
+                  "Undoes a BURN played on the Target. Play it just after the BURN.",
                   "0",
                   "10",
                   "1",
                   "4"
                 ],
                 [
-                  "HEAL + KARMA **",
+                  "HEAL + KARMA",
                   "Anytime",
-                  "(**Anytime)  Undoes ('heals') the action of a “BURN” Action Tokenz that has been played on the Target AND RETURNS the BURN by reversing the most recent (prior) score of the “burning” Player. Unlike standard Action Tokenz, the issuing Player may play this Action Tokenz anytime (without waiting for their turn) on any Target who just received a \"BURN\" Action Tokenz.",
+                  "Undoes a BURN played on the Target, and turns it back on the Player who played the BURN: their most recent score becomes minus points. Play it just after the BURN.",
                   "0",
                   "10",
                   "1",
                   "4"
                 ],
                 [
-                  "HOLD **",
+                  "HOLD",
                   "Anytime",
-                  "(**Anytime)  Player may place a spare Letter Tile (drawn from the draw pile) face-down at any Grid position to reserve that Grid spot for their next turn's use. Unlike standard Action Tokenz, the issuing Player may play this Action Tokenz anytime (without waiting for their turn); this HOLD action has a \"Use It or Lose It\" condition and will expire upon the issuing Active Player's next turn, then the spare Letter Tile is returned to the Letter Tile draw pile.",
+                  "Draw a spare Letter Tile and place it face-down on any Grid space, to save that space for your next turn. Use it or lose it: at your next turn the HOLD ends, and the spare tile goes back to the draw pile. No one else may play on that space until the HOLD ends.",
                   "0",
                   "10",
                   "1",
@@ -1330,7 +1374,7 @@ window.COJOINZ_DATA = {
                 [
                   "MOVE 1 TILE",
                   "Standard",
-                  "In addition to (but not as a substitution for) using Letter Tile(s) from their own hand, the Active Player may relocate any single current Grid tile to use in their newly-formed word, subject to Word Validity rule. The word(s) from which any Letter Tiles were REMOVED do not count as Grid Play for points; points are earned only from the Active Player's newly-formed word(s) that include all of the Active Player's Letter Tiles (from their hand) as well as the MOVED Letter Tile. [The moved Letter Tile acts only as an extra Letter Tile to that of the Active Player's own Letter Tile(s), and it may only be used in standard Grid Play manner to form new word(s).]",
+                  "As well as playing your own Letter Tiles, move one Letter Tile already on the Grid into your new word. Every word must stay valid. The word you took it from scores nothing; you score only your new word(s), which must use all the Letter Tiles you played plus the moved tile.",
                   "0",
                   "10",
                   "1",
@@ -1339,7 +1383,7 @@ window.COJOINZ_DATA = {
                 [
                   "NEW HAND",
                   "Standard",
-                  "The Active Player discards (returns to the draw pile) any or all of their Letter Tiles and receives replacements, then play advances to the next Player in rotation. This uses the Active Player's whole turn (like an Exchange), but does not count toward their 3 Exchanges per game.",
+                  "Return any or all of your Letter Tiles to the draw pile and draw replacements. This is your whole turn (like an Exchange), but it doesn't count toward your 3 Exchanges.",
                   "0",
                   "10",
                   "1",
@@ -1348,7 +1392,7 @@ window.COJOINZ_DATA = {
                 [
                   "NEW HAND +",
                   "Standard",
-                  "The Active Player discards (returns to the draw pile) any or all of their Letter Tiles and receives replacements, then the Active Player may also play Letter Tiles and Bonus Tokenz per normal Grid play. This does not count as an Exchange turn.",
+                  "Return any or all of your Letter Tiles to the draw pile and draw replacements, then take your Grid Play and Bonus Tokenz as normal. It doesn't count as an Exchange.",
                   "0",
                   "10",
                   "1",
@@ -1357,7 +1401,7 @@ window.COJOINZ_DATA = {
                 [
                   "NEW T-PAIR",
                   "Standard",
-                  "The Active Player earns 1 new T-PAIR (1 Action Tokenz and 1 Bonus Tokenz), not subject to the T-PAIR Share rule (unshared).",
+                  "Take 1 new T-PAIR (1 Action Tokenz and 1 Bonus Tokenz). You keep both: no T-PAIR Share.",
                   "0",
                   "10",
                   "1",
@@ -1366,7 +1410,7 @@ window.COJOINZ_DATA = {
                 [
                   "REMOVE 1 TILE",
                   "Standard",
-                  "The Active Player discards any top single tile of any 1 stack; revealing the underlying layer. The Active Player is not obligated to play within the removed Grid string.  \"REMOVE\" Action Tokenz are the only Tokenz that are not subject to the Word Validity rule for surviving Grid Letters.",
+                  "Remove 1 top Letter Tile from a Grid Word [see 4.7.2].",
                   "0",
                   "10",
                   "1",
@@ -1375,7 +1419,7 @@ window.COJOINZ_DATA = {
                 [
                   "REMOVE 1 WORD",
                   "Standard",
-                  "The Active Player discards all top-layer tiles from one continuous word. \"REMOVE\" Action Tokenz are the only Tokenz that are not subject to the Word Validity rule for surviving Grid Letters.",
+                  "Remove all the top Letter Tiles of one Grid Word [see 4.7.2].",
                   "0",
                   "10",
                   "1",
@@ -1384,7 +1428,7 @@ window.COJOINZ_DATA = {
                 [
                   "REMOVE 2 TILES",
                   "Standard",
-                  "The Active Player discards one top tile each from any 2 stacks within one Grid Word, or two tiles from one stack within one Grid Word.  \"REMOVE\" Action Tokenz are the only Tokenz that are not subject to the Word Validity rule for surviving Grid Letters.",
+                  "Remove the top tile from each of 2 stacks, or 2 tiles from 1 stack, in one Grid Word [see 4.7.2].",
                   "0",
                   "10",
                   "1",
@@ -1393,7 +1437,7 @@ window.COJOINZ_DATA = {
                 [
                   "REMOVE 3 TILES",
                   "Standard",
-                  "The Active Player discards one top tile each from any 3 stacks within one Grid Word; or 2 tiles from one stack and 1 tile from another stack within one Grid Word; or 3 tiles from one stack within one Grid Word.  \"REMOVE\" Action Tokenz are the only Tokenz that are not subject to the Word Validity rule for surviving Grid Letters.",
+                  "Remove the top tile from each of 3 stacks; or 2 tiles from 1 stack and 1 from another; or 3 tiles from 1 stack, all in one Grid Word [see 4.7.2].",
                   "0",
                   "10",
                   "1",
@@ -1402,7 +1446,7 @@ window.COJOINZ_DATA = {
                 [
                   "REVERSE",
                   "Standard",
-                  "Flips direction of play from CW (default) to CCW (or vice versa). In 2-Player games, this Tokenz acts to skip the Active Player's turn (with zero points scored).",
+                  "Reverses the direction of play (clockwise ↔ counterclockwise). In a 2-Player game, you skip your current turn instead (0 points) and your opponent plays next. Playing it still gets rid of the Tokenz and its Hand Points, or can be a kind gesture to a trailing opponent.",
                   "0",
                   "10",
                   "1",
@@ -1411,7 +1455,7 @@ window.COJOINZ_DATA = {
                 [
                   "SCATTER PLAY",
                   "Standard",
-                  "The Active Player plays up to 3 of their Letter Tiles any place on the Grid as long as they connect to existing words (if Letter Tiles exist on the Grid), but they do not need to be played in the same word string(s) as required in standard Grid Play.  All newly-formed words must follow the Word Validity rule.",
+                  "Play up to 3 of your Letter Tiles anywhere on the Grid, as long as each one touches an existing word. They don't have to be in one line or one word. Every new word must be valid.",
                   "0",
                   "10",
                   "1",
@@ -1420,7 +1464,7 @@ window.COJOINZ_DATA = {
                 [
                   "SKIP TURN",
                   "Standard",
-                  "Skips the Target’s next turn in rotation. The Active Player will place this Tokenz (sideways) in front of the Target to clearly mark them, and it will be placed on the Active Player's Action Tokenz discard pile once the Target's turn has been skipped. This Action Tokenz may be reversed (\"unskipped\", in this case) via the use of a \"Back Atchu\" Action Tokenz (but not a \"HEAL\" Action Tokenz, as these are limited to \"BURN\" Action Tokenz).",
+                  "The Target misses their next turn. Place this Tokenz sideways in front of them as a reminder; once their turn is skipped, it goes to your discard pile. Can be reversed by BACK ATCHU (not by HEAL).",
                   "0",
                   "10",
                   "1",
@@ -1429,7 +1473,7 @@ window.COJOINZ_DATA = {
                 [
                   "STEAL 1 ACTION",
                   "Standard",
-                  "The Active Player blindly steals 1 Action Tokenz from their Target.",
+                  "Take 1 Action Tokenz from your Target, without looking.",
                   "0",
                   "10",
                   "1",
@@ -1438,7 +1482,7 @@ window.COJOINZ_DATA = {
                 [
                   "STEAL 1 BONUS",
                   "Standard",
-                  "The Active Player blindly steals 1 Bonus Tokenz from their Target.",
+                  "Take 1 Bonus Tokenz from your Target, without looking.",
                   "0",
                   "10",
                   "1",
@@ -1447,7 +1491,7 @@ window.COJOINZ_DATA = {
                 [
                   "STEAL 3 ACTION(s)",
                   "Standard",
-                  "The Active Player blindly steals 1-3 Action Tokenz(s) from their Target (only one Player may be the Target).",
+                  "Take 1–3 Action Tokenz from one Target, without looking.",
                   "0",
                   "10",
                   "1",
@@ -1456,7 +1500,7 @@ window.COJOINZ_DATA = {
                 [
                   "STEAL 3 BONUS(es)",
                   "Standard",
-                  "The Active Player blindly steals 1-3 Bonus Tokenz(s) from their Target (only one Player may be the Target).",
+                  "Take 1–3 Bonus Tokenz from one Target, without looking.",
                   "0",
                   "10",
                   "1",
@@ -1465,25 +1509,25 @@ window.COJOINZ_DATA = {
                 [
                   "SWAP - BONUSes",
                   "Standard",
-                  "The Active Player will identify their first chosen Target and their chosen quantity of Bonus Tokenz, and both Players will blindly swap their Bonus Tokenz accordingly; then Active Player will repeat for their subsequent Target(s), once per Target. (Bonus Tokenz quantities for each Target do not need to match)  (No Bonus Tokenz are swapped with Players who currently own none.)",
+                  "Swap Bonus Tokenz with one or more Targets, one Target at a time. For each Target, choose how many to swap; you both swap without looking. The number can differ for each Target. Players with no Bonus Tokenz can't be chosen.",
                   "0",
                   "10",
                   "1",
                   "4"
                 ],
                 [
-                  "SWAP- ACTIONs",
+                  "SWAP - ACTIONs",
                   "Standard",
-                  "The Active Player will identify their first chosen Target(s) and their chosen quantity of Action Tokenz, and both Players will blindly swap their Action Tokenz accordingly; then, the Active Player will repeat for their subsequent Target(s), once per Target. (Action Tokenz quantities for each Target do not need to match)  (No Action Tokenz are swapped with Players who currently own none.)",
+                  "Swap Action Tokenz with one or more Targets, one Target at a time. For each Target, choose how many to swap; you both swap without looking. The number can differ for each Target. Players with no Action Tokenz can't be chosen.",
                   "0",
                   "10",
                   "1",
                   "4"
                 ],
                 [
-                  "SWAP- TILEs",
+                  "SWAP - TILEs",
                   "Standard",
-                  "The Active Player will identify their first chosen Target and their chosen quantity of Letter Tiles, and both Players will blindly swap their Letter Tiles accordingly; then, repeat for each of the Active Player’s subsequent chosen Target(s), once per Target. (Letter Tile quantities for each Target do not need to match)",
+                  "Swap Letter Tiles with one or more Targets, one Target at a time. For each Target, choose how many to swap; you both swap without looking. The number can differ for each Target.",
                   "0",
                   "10",
                   "1",
@@ -1492,7 +1536,7 @@ window.COJOINZ_DATA = {
                 [
                   "SWITCH WILD TILE",
                   "Standard",
-                  "Active Player may switch one Wild Letter Tile on the Grid with an equivalent Letter Tile from their hand; this Wild Letter Tile may either be used in that current turn or saved for future use. This only applies to one-tile switches, so the equivalent Letter Tile must not change the original quantity of Grid Tiles in the affected word string. This would permit, for instance, switching a \"TH\" Letter Tile in one's hand for a Wild Letter Tile that is currently in place on the Grid for \"TH\" letters.",
+                  "Swap one Wild Letter Tile on the Grid for the matching Letter Tile from your hand (for example, your TH tile for a Wild Letter Tile standing for TH). Take the Wild Letter Tile into your hand to use now or later. It must be one tile for one tile, so the word keeps the same number of tiles.",
                   "0",
                   "10",
                   "1",
@@ -1501,7 +1545,7 @@ window.COJOINZ_DATA = {
                 [
                   "TEAM WORK",
                   "Standard",
-                  "Starts a \"TEAM Turn\" where all Players (as \"Partners\") pool all of their Letter Tiles by placing them in front of their Game Rack (facing away). Partners seek to create the best possible Grid Play based on their collective Letter Tiles and the Grid's Letter Tiles. The Leader has the final say as to the final Grid Play.",
+                  "Starts a TEAM Turn [see 4.10].",
                   "0",
                   "10",
                   "1",
@@ -1509,8 +1553,8 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "TRADE TIME",
-                  "Standard -  Special Session",
-                  "SPECIAL SESSION that pauses Grid play. The Active Player publicly announces open trading among all Players) to enable all Players to trade Letter Tiles and/or Tokenz with one or more Players.",
+                  "Special Session",
+                  "Starts a TRADE TIME Special Session [see 4.8].",
                   "0",
                   "10",
                   "1",
@@ -1518,7 +1562,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "WAGER | ALL TILES",
-                  "Standard -  Special Session",
+                  "Special Session",
                   "Starts a WAGER Session [see 4.9]. Goal: the highest total points for all the Letter Tiles in your hand.",
                   "0",
                   "10",
@@ -1527,7 +1571,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "WAGER | BEST TILE",
-                  "Standard -  Special Session",
+                  "Special Session",
                   "Starts a WAGER Session [see 4.9]. Goal: your single highest-point Letter Tile.",
                   "0",
                   "10",
@@ -1536,7 +1580,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "WAGER | BEST WORD",
-                  "Standard -  Special Session",
+                  "Special Session",
                   "Starts a WAGER Session [see 4.9]. Goal: your highest-scoring valid word, using only the Letter Tiles in your hand.",
                   "0",
                   "10",
@@ -1555,11 +1599,19 @@ window.COJOINZ_DATA = {
           "blocks": [
             {
               "type": "paragraph",
-              "text": "Bonus Tokenz supercharge scoring potential by adding 17 different ways to increase the points earned in Grid Play. Bonus Tokenz are the last step in tallying Grid Play points."
+              "text": "In short: All 17 Bonus Tokenz. Play one per turn, after your first tally [see 4.11]."
+            },
+            {
+              "type": "paragraph",
+              "text": "• When a Bonus Tokenz lets you choose a tile or a word, Scorz picks the highest-value one unless you choose differently."
+            },
+            {
+              "type": "paragraph",
+              "text": "• For TURN, WORD and WILD WORD Tokenz, the 2x or 3x is the total for what it doubles or triples, not extra points on top."
             },
             {
               "type": "table",
-              "caption": "BONUS Tokenz - Full List (with Functions, Play Points, and Hand Points):",
+              "caption": "All 17 Bonus Tokenz",
               "headers": [
                 "BONUS TOKENZ\nNAME",
                 "GAMEPLAY\nFUNCTION",
@@ -1571,7 +1623,7 @@ window.COJOINZ_DATA = {
               "rows": [
                 [
                   "TILE 2x",
-                  "In ADDITION to the single selected Letter Tile's word-string point total, this doubles its point value. The Active Player may select any of the Letter Tiles in the entire word string that the Active Player modified in that turn (not limited to the Letter Tiles that the Active Player added to any existing Grid Word). [By default, SCORZ will automatically select the highest-value Letter Tile]",
+                  "Doubles one Letter Tile: its points count twice. Choose any Letter Tile in a word you changed this turn, not just the tiles you added.",
                   "1",
                   "6",
                   "2x letter pts",
@@ -1579,7 +1631,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "TILE 3x",
-                  "In ADDITION to the single selected Letter Tile's word-string point total, this triples its point value. The Active Player may select any of the Letter Tiles in the entire word string that the Active Player modified in that turn (not limited to the Letter Tiles that the Active Player added to any existing Grid Word). [By default, SCORZ will automatically select the highest-value Letter Tile]",
+                  "Triples one Letter Tile: its points count three times. Choose any Letter Tile in a word you changed this turn, not just the tiles you added.",
                   "1",
                   "4",
                   "3x letter pts",
@@ -1587,7 +1639,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "STACK - ANY 1",
-                  "Adds the cumulative point value of all tiles (top and concealed) in any one selected stack (of any type) within the Active Player's word string for that turn.",
+                  "Count every tile (top and hidden) in 1 stack of any kind in your word this turn [see 4.11.1].",
                   "1",
                   "4",
                   "1 stack (any)",
@@ -1595,7 +1647,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "STACK - COMBI",
-                  "Adds the cumulative point value of all tiles (top and concealed) in any one COMBI LETTER stack within the Active Player's word string for that turn.",
+                  "Count every tile (top and hidden) in 1 COMBI LETTER stack (its top Letter Tile shows 2 or 3 letters, e.g. TH, EST) in your word this turn [see 4.11.1].",
                   "1",
                   "4",
                   "1 combo stack",
@@ -1603,7 +1655,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "STACK - CONSO",
-                  "Adds the cumulative point value of all tiles (top and concealed) in any one CONSONANT (single letter) stack within the Active Player's word string for that turn.",
+                  "Count every tile (top and hidden) in 1 consonant (single-letter) stack in your word this turn [see 4.11.1].",
                   "1",
                   "4",
                   "1 conso stack",
@@ -1611,7 +1663,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "STACK - VOWEL",
-                  "Adds the cumulative point value of all tiles (top and concealed) in any one VOWEL (single letter) stack within the Active Player's word string for that turn.",
+                  "Count every tile (top and hidden) in 1 vowel (single-letter) stack in your word this turn [see 4.11.1].",
                   "1",
                   "4",
                   "1 vowel stack",
@@ -1619,7 +1671,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "STACKS - ANY 2",
-                  "Adds the cumulative point value of all tiles (top and concealed) in any two selected stacks (of any type, if available) within the Active Player's word string for that turn.",
+                  "Count every tile (top and hidden) in 2 stacks of any kind, if available, in your word this turn [see 4.11.1].",
                   "1",
                   "2",
                   "2 stacks (any)",
@@ -1627,7 +1679,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "TURN + 5 PTS",
-                  "Adds 5 points to the Active Player's Grid Play total.",
+                  "Adds 5 points to your Grid Play total.",
                   "1",
                   "8",
                   "5",
@@ -1635,7 +1687,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "TURN +10 PTS",
-                  "Adds 10 points to the Active Player's Grid Play total.",
+                  "Adds 10 points to your Grid Play total.",
                   "1",
                   "8",
                   "10",
@@ -1643,7 +1695,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "TURN +15 PTS",
-                  "Adds 15 points to the Active Player's Grid Play total.",
+                  "Adds 15 points to your Grid Play total.",
                   "1",
                   "6",
                   "15",
@@ -1651,7 +1703,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "TURN +20 PTS",
-                  "Adds 20 points to the Active Player's Grid Play total.",
+                  "Adds 20 points to your Grid Play total.",
                   "1",
                   "4",
                   "20",
@@ -1659,7 +1711,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "TURN +25 PTS",
-                  "Adds 25 points to the Active Player's Grid Play total.",
+                  "Adds 25 points to your Grid Play total.",
                   "1",
                   "2",
                   "25",
@@ -1667,7 +1719,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "TURN 2x",
-                  "Doubles the Active Player's Grid Play total. [This is an aggregate, not a supplement, so the 2x is the total points for that turn.]",
+                  "Doubles your Grid Play total.",
                   "1",
                   "3",
                   "2x turn pts",
@@ -1675,7 +1727,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "TURN 3x",
-                  "Triples the Active Player's Grid Play total. [This is an aggregate, not a supplement, so the 3x is the total points for that turn.]",
+                  "Triples your Grid Play total.",
                   "1",
                   "1",
                   "3x turn pts",
@@ -1683,7 +1735,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "WILD WORD 2x",
-                  "Doubles the point value of any word-string(s) that contains a Wild Letter Tile in the entire word string(s) that the Active Player modified in that turn (not limited to one word-string). This 2x is aggregate (not supplemental) in that the total point value for the affected word string(s) is doubled, not 2x in addition to the raw word string(s) point value.",
+                  "Doubles every word you changed this turn that contains a Wild Letter Tile.",
                   "1",
                   "2",
                   "2x word(s) pts",
@@ -1691,7 +1743,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "WORD 2x",
-                  "Doubles the point value of one newly-formed word in the Active Player's Grid Play. [By default, SCORZ will automatically select the highest-value word, if multiple words are formed]",
+                  "Doubles one new word in your Grid Play.",
                   "1",
                   "4",
                   "2x word pts",
@@ -1699,7 +1751,7 @@ window.COJOINZ_DATA = {
                 ],
                 [
                   "WORD 3x",
-                  "Triples the point value of one newly-formed word in the Active Player's Grid Play. [By default, SCORZ will automatically select the highest-value word, if multiple words are formed]",
+                  "Triples one new word in your Grid Play.",
                   "1",
                   "2",
                   "3x word pts",
@@ -1717,15 +1769,27 @@ window.COJOINZ_DATA = {
           "blocks": [
             {
               "type": "paragraph",
-              "text": "There are several ways to obtain Tokenz, and the most common ways involve earning Tokenz in pairs (consisting of 1 Bonus Tokenz and 1 Action Tokenz) - called a \"T-PAIR\"."
+              "text": "In short: A T-PAIR is 1 Action Tokenz plus 1 Bonus Tokenz. Earning T-PAIRs is the main way to get Tokenz."
             },
             {
               "type": "paragraph",
-              "text": "**“T-PAIR” Process**"
+              "text": "• For each T-PAIR you earn, draw 1 Action Tokenz, then 1 Bonus Tokenz, without looking."
             },
             {
               "type": "paragraph",
-              "text": "• When a Player earns one or more T-PAIRs (the “Earning Player”), they blindly draw one Action Tokenz from its draw deck and then draw one Bonus Tokenz from its draw deck. This sequence is always followed, regardless of how many T-PAIRS the Player earns. In the Bonus-Lite and Action-Lite Versions, the Earning Player instead draws only one Tokenz of the type used in that version (Bonus or Action). Usually, immediately after each T-PAIR is drawn, something very special happens: it is called the \"T-PAIR Share\":"
+              "text": "• Bonus-Lite and Action-Lite: draw just 1 Tokenz, of the type your version uses."
+            },
+            {
+              "type": "paragraph",
+              "text": "• Earned more than one? Draw and share them one T-PAIR at a time."
+            },
+            {
+              "type": "paragraph",
+              "text": "• How T-PAIRs are earned [see 5.3]. Draw deck empty? [see 3.6]"
+            },
+            {
+              "type": "paragraph",
+              "text": "• Right after drawing, you usually share one of the two [see 3.5]."
             }
           ],
           "children": []
@@ -1737,31 +1801,51 @@ window.COJOINZ_DATA = {
           "blocks": [
             {
               "type": "paragraph",
-              "text": "The Earning Player privately views both Tokenz from each T-PAIR and then chooses either one of the Tokenz to give to any other individual Player (the “Recipient Player”), while keeping the remaining Tokenz. Players may earn multiple T-PAIRS in each turn, and they will always use this one-T-PAIR-at-a-time sequence for the T-PAIR Share, regardless of how many T-PAIRS they earn."
+              "text": "In short: For each T-PAIR you earn, you keep one Tokenz and give the other to another Player of your choice."
             },
             {
               "type": "paragraph",
-              "text": "**Exemptions to the T-PAIR Share Rule**"
+              "text": "1. Look at both Tokenz privately."
             },
             {
               "type": "paragraph",
-              "text": "The following do not follow the T-PAIR Share rule, as the Player who receives them keeps all Tokenz:"
+              "text": "2. Choose one to give to any one other Player (the Recipient)."
             },
             {
               "type": "paragraph",
-              "text": "• **VALID WORD:** In 2-Player games' Word Challenges, the Challenged Player keeps both Tokenz as a reward for winning the challenge [see Rule 4.4]; for games of 3+ Players, the T-PAIR Share rule applies."
+              "text": "3. Keep the other one."
             },
             {
               "type": "paragraph",
-              "text": "• **INVALID WORD:** In 2-Player game's Word Challenges, the Challenging Player keeps both Tokenz as a reward for winning the challenge [see Rule 4.4]; for games of 3+ Players, the T-PAIR Share rule applies."
+              "text": "• With several T-PAIRs, repeat for each one, one at a time."
             },
             {
               "type": "paragraph",
-              "text": "• **WAGER Session payoff:** the Winning Player who won the payoff \"pot\" keeps all Tokenz [see Rule 4.9.8]"
+              "text": "**When the Share doesn't apply**"
             },
             {
               "type": "paragraph",
-              "text": "• **Certain Bonus Tokenz:** Any Player who receives a Bonus Tokenz when “STEAL … Bonus” or a “GIVE Bonus(es)” Action Tokenz are played keeps all these Tokenz (these actions involve individual Tokenz, not T-PAIRs, so they are not subject to the T-PAIR Share rule)."
+              "text": "• Setup: the opening draw is not shared."
+            },
+            {
+              "type": "paragraph",
+              "text": "• Word Challenges in 2-Player games: the winner keeps both Tokenz [see 4.4]. With 3–6 Players, the Share applies."
+            },
+            {
+              "type": "paragraph",
+              "text": "• NEW T-PAIR Action Tokenz: you keep both."
+            },
+            {
+              "type": "paragraph",
+              "text": "• WAGER winnings: the winner keeps everything [see 4.9.8]."
+            },
+            {
+              "type": "paragraph",
+              "text": "• STEAL … BONUS and GIVE BONUS(es): these move single Tokenz, not T-PAIRs, so the Player who gets them keeps them."
+            },
+            {
+              "type": "paragraph",
+              "text": "• The T-PAIR Share column in the Earning T-PAIRs table shows every case [see 5.3]."
             }
           ],
           "children": []
@@ -1773,19 +1857,35 @@ window.COJOINZ_DATA = {
           "blocks": [
             {
               "type": "paragraph",
-              "text": "When standard Tokenz are played during a Player's turn, only one of each Tokenz may be played and their function affects only that individual turn."
+              "text": "In short: Play at most one standard Action Tokenz and one Bonus Tokenz per turn. Used Tokenz go face-up beside your Game Rack."
             },
             {
               "type": "paragraph",
-              "text": "• \"Anytime\" Action Tokenz may only be played outside of a Player's turn and are therefore not limited to one/turn. However, \"Anytime\" Action Tokenz are limited to one action per Tokenz and they expire after their action is completed."
+              "text": "• Standard Tokenz: one of each type per turn, and the effect lasts only that turn, unless the Tokenz says otherwise (for example AXIS LOCK, HOLD or SKIP TURN)."
             },
             {
               "type": "paragraph",
-              "text": "• All used Bonus Tokenz get discarded face-up immediately next to each Player’s Game Rack, adjacent to and separate from discarded Action Tokenz."
+              "text": "• Anytime Action Tokenz are played outside your own turn, so they aren't limited to one per turn. Each one does one action, then ends."
             },
             {
               "type": "paragraph",
-              "text": "• During a Player's turn, standard Action Tokenz are placed in front of their Game Rack for all Player's to view. In the case of some (not all) \"Anytime\" Action Tokenz, they are placed in front of the Target of that specific Action, until it expires. Once expired, all Action Tokenz are placed in a stack in front of their issuing Player, to the left of their Game Rack. This placement is needed for \"Copy Cat\" Action Tokenz that later rely on referring to the most recently played Action Tokenz."
+              "text": "**Where used Tokenz go**"
+            },
+            {
+              "type": "paragraph",
+              "text": "• While it is in effect, an Action Tokenz sits face-up in front of your Game Rack for all to see. Some Anytime Action Tokenz sit in front of their Target until they end."
+            },
+            {
+              "type": "paragraph",
+              "text": "• Then it goes on your Action Tokenz discard pile, to the left of your Game Rack. COPY CAT relies on this pile to show the last Action Tokenz played."
+            },
+            {
+              "type": "paragraph",
+              "text": "• Used Bonus Tokenz go face-up next to your Game Rack, in a pile separate from your Action Tokenz."
+            },
+            {
+              "type": "paragraph",
+              "text": "• When a Tokenz draw deck runs out, shuffle all used Tokenz of that type into a new draw deck."
             }
           ],
           "children": []
